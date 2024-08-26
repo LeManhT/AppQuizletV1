@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/fragmentHome3">
+    <fragment
+        android:id="@+id/fragmentLibrary2"
+        android:name="com.example.quizletappandroidv1.ui.fragments.FragmentLibrary"
+        android:label="FragmentLibrary" >
+        <action
+            android:id="@+id/action_fragmentLibrary2_to_add3"
+            app:destination="@id/add3" />
+        <action
+            android:id="@+id/action_fragmentLibrary2_to_profile"
+            app:destination="@id/profile" />
+        <action
+            android:id="@+id/action_fragmentLibrary2_to_fragmentHome3"
+            app:destination="@id/fragmentHome3" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentHome3"
+        android:name="com.example.quizletappandroidv1.ui.fragments.FragmentHome"
+        android:label="FragmentHome" >
+        <action
+            android:id="@+id/action_fragmentHome3_to_fragmentLibrary2"
+            app:destination="@id/fragmentLibrary2" />
+    </fragment>
+    <fragment
+        android:id="@+id/profile"
+        android:name="com.example.quizletappandroidv1.ui.fragments.Profile"
+        android:label="Profile" >
+        <action
+            android:id="@+id/action_profile_to_fragmentLibrary2"
+            app:destination="@id/fragmentLibrary2" />
+    </fragment>
+    <fragment
+        android:id="@+id/add3"
+        android:name="com.example.quizletappandroidv1.ui.fragments.Add"
+        android:label="Add" >
+        <action
+            android:id="@+id/action_add3_to_fragmentLibrary2"
+            app:destination="@id/fragmentLibrary2" />
+    </fragment>
+</navigation>

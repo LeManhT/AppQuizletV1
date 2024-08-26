@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/txtNameAchievement"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/mar_10"
+        android:gravity="center"
+        android:text="@string/pf_achievement"
+        android:textColor="@color/txt_black_primary"
+        android:textSize="@dimen/text_size_22"
+        android:textStyle="bold" />
+
+
+    <ImageView
+        android:id="@+id/imgAchievement"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:contentDescription="@string/dark"
+        tools:srcCompat="@raw/ac202" />
+
+    <TextView
+        android:id="@+id/txtPoints"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginVertical="@dimen/pad_5"
+        android:drawablePadding="@dimen/pad_5"
+        android:gravity="center"
+        android:text="@string/pf_achievement"
+        android:textColor="@color/txt_black_primary"
+        app:drawableEndCompat="@drawable/dollar_coins" />
+
+
+    <com.example.quizletappandroidv1.utils.CustomProgressBar
+        android:id="@+id/customProgressBar"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_marginHorizontal="@dimen/mar_30"
+        android:layout_marginVertical="@dimen/mar_15" />
+
+
+    <TextView
+        android:id="@+id/txtAchievementDesc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/mar_10"
+        android:gravity="center"
+        android:text="@string/pf_achievement"
+        android:textColor="@color/txt_black_primary" />
+
+</LinearLayout>

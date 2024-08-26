@@ -1,0 +1,9 @@
+package com.example.quizletappandroidv1.utils
+
+class Constants {
+    companion object {
+        const val baseUrl = "http://khanhlinh25-001-site1.ftempurl.com/api/"
+        const val baseUrlQuote = "https://api.quotable.io/"
+        const val notiBaseUrl = "https://fcm.googleapis.com"
+    }
+}

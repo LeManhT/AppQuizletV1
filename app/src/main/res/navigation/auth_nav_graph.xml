@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/auth_nav_graph"
+    app:startDestination="@id/startAppFragment">
+
+    <fragment
+        android:id="@+id/signIn2"
+        android:name="com.example.quizletappandroidv1.ui.fragments.SignIn"
+        android:label="SignIn" >
+        <action
+            android:id="@+id/action_signIn2_to_startAppFragment"
+            app:destination="@id/startAppFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/signUp2"
+        android:name="com.example.quizletappandroidv1.ui.fragments.SignUp"
+        android:label="SignUp" >
+        <action
+            android:id="@+id/action_signUp2_to_startAppFragment"
+            app:destination="@id/startAppFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/startAppFragment"
+        android:name="com.example.quizletappandroidv1.ui.fragments.StartAppFragment"
+        android:label="StartAppFragment" >
+        <action
+            android:id="@+id/action_startAppFragment_to_signIn2"
+            app:destination="@id/signIn2" />
+        <action
+            android:id="@+id/action_startAppFragment_to_signUp2"
+            app:destination="@id/signUp2" />
+    </fragment>
+</navigation>
