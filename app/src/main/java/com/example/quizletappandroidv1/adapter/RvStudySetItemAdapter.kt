@@ -1,6 +1,7 @@
 package com.example.quizletappandroidv1.adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -11,6 +12,7 @@ import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.databinding.LayoutCreateSetItemBinding
 import com.example.quizletappandroidv1.models.StudySetModel
 import com.example.quizletappandroidv1.utils.Helper
+import com.google.gson.Gson
 
 class RvStudySetItemAdapter(
     private val context: Context,
@@ -117,6 +119,7 @@ class RvStudySetItemAdapter(
 
     fun updateData(newData: List<StudySetModel>) {
         listStudySet.clear()
+        Log.d("newData", Gson().toJson(newData))
         listStudySet.addAll(newData)
         notifyDataSetChanged()
     }

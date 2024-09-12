@@ -1,14 +1,16 @@
 package com.example.quizletappandroidv1
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.example.quizletappandroidv1.databinding.ActivityMainBinding
+import com.example.quizletappandroidv1.ui.fragments.Add
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
@@ -26,16 +28,21 @@ class MainActivity : AppCompatActivity() {
         // Set up the BottomNavigationView with NavController
         NavigationUI.setupWithNavController(binding.bottomNavigationView, navController)
 
-//        // Add an OnDestinationChangedListener for custom logic
-//        navController.addOnDestinationChangedListener { _, destination, _ ->
-//            when (destination.id) {
-//                R.id.fragmentLibrary2 -> Log.d("NavDestination", "Navigated to Library")
-//                R.id.fragmentHome3 -> Log.d("NavDestination", "Navigated to Home")
-//                R.id.profile -> Log.d("NavDestination", "Navigated to Profile")
-//                R.id.add3 -> Log.d("NavDestination", "Navigated to Add")
-//            }
-//        }
+        binding.bottomNavigationView.setOnItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.add3 -> {
+                    // Show the Add BottomSheetDialogFragment
+                    val addFragment = Add()
+                    addFragment.show(supportFragmentManager, addFragment.tag)
+                    true
+                }
 
+                else -> {
+                    NavigationUI.onNavDestinationSelected(menuItem, navController)
+                    true
+                }
+            }
+        }
 
     }
 

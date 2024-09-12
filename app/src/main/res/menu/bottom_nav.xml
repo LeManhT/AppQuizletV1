@@ -8,7 +8,7 @@
         android:icon="@drawable/home"
         android:title="@string/li_home" />
     <item
-        android:id="@+id/bottom_solution"
+        android:id="@+id/fragmentSolution"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/book"

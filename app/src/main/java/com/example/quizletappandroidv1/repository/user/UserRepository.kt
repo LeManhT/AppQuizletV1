@@ -2,10 +2,12 @@ package com.example.quizletappandroidv1.repository.user
 
 import android.net.http.HttpException
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresExtension
 import com.example.quizletappandroidv1.database.api.retrofit.ApiService
 import com.example.quizletappandroidv1.entity.UserResponse
 import com.example.quizletappandroidv1.utils.Helper
+import com.google.gson.Gson
 import com.google.gson.JsonObject
 import timber.log.Timber
 import java.io.IOException
@@ -29,6 +31,7 @@ class UserRepository @Inject constructor(private val apiService: ApiService) {
                 Result.success("Sign-up successful")
             } else {
                 val errorMessage = result.errorBody()?.string() ?: "Unknown error"
+                Log.d("ERRRORRR", errorMessage.toString())
                 Result.failure(Exception(errorMessage))
             }
         } catch (e: IOException) {
@@ -53,6 +56,7 @@ class UserRepository @Inject constructor(private val apiService: ApiService) {
             val result = apiService.loginUser(body)
             if (result.isSuccessful) {
                 val userResponse = result.body()!!
+                Log.d("userResponse", Gson().toJson(userResponse))
                 Result.success(userResponse)
             } else {
                 val errorMessage = result.errorBody()?.string() ?: "Unknown error"
@@ -70,4 +74,47 @@ class UserRepository @Inject constructor(private val apiService: ApiService) {
             Result.failure(e)
         }
     }
+
+    suspend fun changeEmail(userId: String, newEmail: String): Result<UserResponse> {
+        return try {
+            val body = JsonObject().apply { addProperty("email", newEmail) }
+            val response = apiService.updateUserInfoNoImg(userId, body)
+            if (response.isSuccessful) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception(response.errorBody()?.string()))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun changePassword(
+        userId: String,
+        oldPass: String,
+        newPass: String
+    ): Result<UserResponse> {
+        return try {
+            val body = JsonObject().apply {
+                addProperty(
+                    "oldPassword",
+                    oldPass
+                )
+                addProperty("newPassword", newPass)
+            }
+            val result =
+                apiService.changePassword(userId, body)
+            if (result.isSuccessful) {
+                Result.success(result.body()!!)
+            } else {
+                Result.failure(Exception(result.errorBody()?.string()))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
+
 }
+

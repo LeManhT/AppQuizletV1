@@ -427,4 +427,7 @@
         <item>Chinese</item>
     </string-array>
     <string name="title_activity_view_image">ViewImage</string>
+    <string name="top2">Top 2</string>
+    <string name="top1">Top 1</string>
+    <string name="top3">Top 3</string>
 </resources>

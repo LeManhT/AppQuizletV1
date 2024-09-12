@@ -1,60 +1,126 @@
 package com.example.quizletappandroidv1.ui.fragments
 
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.quizletappandroidv1.R
+import android.widget.RadioButton
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import com.example.quizletappandroidv1.databinding.FragmentChangeLanguageBinding
+import java.util.Locale
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ChangeLanguage.newInstance] factory method to
- * create an instance of this fragment.
- */
-class ChangeLanguage : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+class ChangeLanguage : Fragment(), View.OnClickListener {
+    private lateinit var binding: FragmentChangeLanguageBinding
+    private lateinit var sharedPreferences: SharedPreferences
+    var radioButtonChecked: RadioButton? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_change_language, container, false)
+        binding = FragmentChangeLanguageBinding.inflate(layoutInflater, container, false)
+
+        binding.englishRadioButton.setOnClickListener(this)
+        binding.chineseRadioButton.setOnClickListener(this)
+        binding.vietnameseRadioButton.setOnClickListener(this)
+
+
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ChangeLanguage.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ChangeLanguage().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.txtBack.setOnClickListener {
+            requireActivity().finish()
+        }
+
+        sharedPreferences =
+            requireContext().getSharedPreferences("ChangeLanguage", Context.MODE_PRIVATE)
+        var mylang = sharedPreferences.getString("language", "en")
+
+        radioButtonChecked = when (mylang) {
+            "vi" -> binding.vietnameseRadioButton
+            "en" -> binding.englishRadioButton
+            "zh" -> binding.chineseRadioButton
+            else -> null
+        }
+
+        if (mylang == null) {
+            mylang = "en"
+            with(sharedPreferences.edit()) {
+                putString("language", mylang)
+                apply()
             }
+        }
+
+
+        radioButtonChecked?.isChecked = true
+        binding.iconTickChangeLanguage.setOnClickListener {
+            restartApp()
+        }
     }
+
+    private fun changeLanguage(selectedLanguage: String): Locale {
+        val newLocale = when (selectedLanguage) {
+            "English" -> Locale("en")
+            "Vietnamese" -> Locale("vi")
+            "Chinese" -> Locale("zh")
+            else -> Locale("en")
+        }
+        return newLocale
+    }
+
+// ...
+
+    override fun onClick(view: View) {
+        val selectedID = binding.languageRadioGroup.checkedRadioButtonId
+        radioButtonChecked = view.findViewById(selectedID)
+        Toast.makeText(requireContext(), radioButtonChecked?.text.toString(), Toast.LENGTH_SHORT)
+            .show()
+
+        // Update the language code in mylang variable
+        val newLocale = changeLanguage(radioButtonChecked?.text.toString())
+        val newLangCode = newLocale.language
+
+        // Update the language in SharedPreferences
+        with(sharedPreferences.edit()) {
+            putString("language", newLangCode)
+            apply()
+        }
+
+        // Change the locale and restart the app
+        updateLocale(newLocale)
+    }
+
+    // Add a function to update the locale
+    private fun updateLocale(locale: Locale) {
+        val config = resources.configuration
+        Locale.setDefault(locale)
+        config.locale = locale
+
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.N) {
+            requireActivity().createConfigurationContext(config)
+        }
+        resources.updateConfiguration(config, resources.displayMetrics)
+    }
+
+    private fun restartApp() {
+        // Tạo Intent để khởi động lại ứng dụng
+        val intent = requireContext().packageManager
+            .getLaunchIntentForPackage(requireContext().packageName)
+        intent!!.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+        startActivity(intent)
+
+        // Kết thúc Activity hiện tại
+        requireActivity().finish()
+    }
+
+
 }

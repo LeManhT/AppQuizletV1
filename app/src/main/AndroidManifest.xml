@@ -39,6 +39,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.QuizletAppAndroidV1"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:name=".MyApplication"
         tools:replace="android:allowBackup"
         tools:targetApi="31">

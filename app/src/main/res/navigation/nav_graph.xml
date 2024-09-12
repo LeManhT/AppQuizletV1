@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/fragmentHome3">
     <fragment
@@ -16,6 +17,9 @@
         <action
             android:id="@+id/action_fragmentLibrary2_to_fragmentHome3"
             app:destination="@id/fragmentHome3" />
+        <action
+            android:id="@+id/action_fragmentLibrary2_to_fragmentSolution"
+            app:destination="@id/fragmentSolution" />
     </fragment>
     <fragment
         android:id="@+id/fragmentHome3"
@@ -24,6 +28,36 @@
         <action
             android:id="@+id/action_fragmentHome3_to_fragmentLibrary2"
             app:destination="@id/fragmentLibrary2" />
+        <action
+            android:id="@+id/action_fragmentHome3_to_rankLeaderBoard"
+            app:destination="@id/rankLeaderBoard" />
+        <action
+            android:id="@+id/action_fragmentHome3_to_achievements"
+            app:destination="@id/achievements" />
+        <action
+            android:id="@+id/action_fragmentHome3_to_createSet"
+            app:destination="@id/createSet" />
+        <action
+            android:id="@+id/action_fragmentHome3_to_translate"
+            app:destination="@id/translate" />
+        <action
+            android:id="@+id/action_fragmentHome3_to_quizletPlus"
+            app:destination="@id/quizletPlus" />
+        <action
+            android:id="@+id/action_fragmentHome3_to_fragmentSearch"
+            app:destination="@id/fragmentSearch" />
+        <action
+            android:id="@+id/action_fragmentHome3_to_folderDetail"
+            app:destination="@id/folderDetail" />
+        <action
+            android:id="@+id/action_fragmentHome3_to_fragmentMyQuote2"
+            app:destination="@id/fragmentMyQuote" />
+        <action
+            android:id="@+id/action_fragmentHome3_to_quoteInLanguage"
+            app:destination="@id/quoteInLanguage" />
+        <action
+            android:id="@+id/action_fragmentHome3_to_fragmentSolution"
+            app:destination="@id/fragmentSolution" />
     </fragment>
     <fragment
         android:id="@+id/profile"
@@ -32,6 +66,12 @@
         <action
             android:id="@+id/action_profile_to_fragmentLibrary2"
             app:destination="@id/fragmentLibrary2" />
+        <action
+            android:id="@+id/action_profile_to_fragmentSolution"
+            app:destination="@id/fragmentSolution" />
+        <action
+            android:id="@+id/action_profile_to_achievements"
+            app:destination="@id/achievements" />
     </fragment>
     <fragment
         android:id="@+id/add3"
@@ -40,5 +80,95 @@
         <action
             android:id="@+id/action_add3_to_fragmentLibrary2"
             app:destination="@id/fragmentLibrary2" />
+    </fragment>
+    <fragment
+        android:id="@+id/rankLeaderBoard"
+        android:name="com.example.quizletappandroidv1.ui.fragments.RankLeaderBoard"
+        android:label="RankLeaderBoard" >
+        <action
+            android:id="@+id/action_rankLeaderBoard_to_fragmentHome3"
+            app:destination="@id/fragmentHome3" />
+    </fragment>
+    <fragment
+        android:id="@+id/achievements"
+        android:name="com.example.quizletappandroidv1.ui.fragments.Achievements"
+        android:label="Achievements" >
+        <action
+            android:id="@+id/action_achievements_to_fragmentHome3"
+            app:destination="@id/fragmentHome3" />
+        <action
+            android:id="@+id/action_achievements_to_profile"
+            app:destination="@id/profile" />
+    </fragment>
+    <fragment
+        android:id="@+id/createSet"
+        android:name="com.example.quizletappandroidv1.ui.fragments.CreateSet"
+        android:label="CreateSet" >
+        <action
+            android:id="@+id/action_createSet_to_fragmentHome3"
+            app:destination="@id/fragmentHome3" />
+    </fragment>
+    <fragment
+        android:id="@+id/translate"
+        android:name="com.example.quizletappandroidv1.ui.fragments.Translate"
+        android:label="Translate" >
+        <action
+            android:id="@+id/action_translate_to_fragmentHome3"
+            app:destination="@id/fragmentHome3" />
+    </fragment>
+    <fragment
+        android:id="@+id/quizletPlus"
+        android:name="com.example.quizletappandroidv1.ui.fragments.QuizletPlus"
+        android:label="QuizletPlus" >
+        <action
+            android:id="@+id/action_quizletPlus_to_fragmentHome3"
+            app:destination="@id/fragmentHome3" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentSearch"
+        android:name="com.example.quizletappandroidv1.ui.fragments.FragmentSearch"
+        android:label="FragmentSearch" >
+        <action
+            android:id="@+id/action_fragmentSearch_to_fragmentHome3"
+            app:destination="@id/fragmentHome3" />
+    </fragment>
+    <fragment
+        android:id="@+id/folderDetail"
+        android:name="com.example.quizletappandroidv1.ui.fragments.FolderDetail"
+        android:label="FolderDetail" >
+        <action
+            android:id="@+id/action_folderDetail_to_fragmentHome3"
+            app:destination="@id/fragmentHome3" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentMyQuote"
+        android:name="com.example.quizletappandroidv1.ui.fragments.FragmentMyQuote"
+        android:label="FragmentMyQuote" >
+        <action
+            android:id="@+id/action_fragmentMyQuote_to_fragmentHome3"
+            app:destination="@id/fragmentHome3" />
+    </fragment>
+    <fragment
+        android:id="@+id/quoteInLanguage"
+        android:name="com.example.quizletappandroidv1.ui.fragments.QuoteInLanguage"
+        android:label="QuoteInLanguage" >
+        <action
+            android:id="@+id/action_quoteInLanguage_to_fragmentHome3"
+            app:destination="@id/fragmentHome3" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentSolution"
+        android:name="com.example.quizletappandroidv1.ui.fragments.FragmentSolution"
+        android:label="fragment_solution"
+        tools:layout="@layout/fragment_solution" >
+        <action
+            android:id="@+id/action_fragmentSolution_to_profile"
+            app:destination="@id/profile" />
+        <action
+            android:id="@+id/action_fragmentSolution_to_fragmentLibrary2"
+            app:destination="@id/fragmentLibrary2" />
+        <action
+            android:id="@+id/action_fragmentSolution_to_fragmentHome3"
+            app:destination="@id/fragmentHome3" />
     </fragment>
 </navigation>

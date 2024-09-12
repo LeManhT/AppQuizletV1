@@ -1,5 +1,6 @@
 package com.example.quizletappandroidv1.ui.fragments
 
+import CustomPopUpWindow
 import android.app.AlertDialog
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -25,6 +26,7 @@ import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.appquizlet.adapter.StudySetItemAdapter
+import com.example.quizletappandroidv1.MainActivity
 import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.adapter.FlashcardItemAdapter
 import com.example.quizletappandroidv1.custom.CustomToast
@@ -94,171 +96,171 @@ class StudySetDetail : Fragment(), TextToSpeech.OnInitListener,
     }
 
     private suspend fun saveDocx(listCard: MutableList<FlashCardModel>) {
-        val notificationManager =
-            requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val notificationId = 1
-        val channelId = "download_channel"
-        val channelName = "Download Channel"
-
-        val channel =
-            NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW)
-        notificationManager.createNotificationChannel(channel)
-
-        val notificationBuilder = NotificationCompat.Builder(requireContext(), channelId)
-            .setContentTitle("Downloading DOCX")
-            .setContentText("Download in progress")
-            .setSmallIcon(R.drawable.icons8_download_24)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setProgress(100, 0, true)
-            .setOngoing(true)
-
-        notificationManager.notify(notificationId, notificationBuilder.build())
-
-        withContext(Dispatchers.IO) {
-            try {
-                val document = XWPFDocument()
-
-                for (progress in 1..100) {
-                    // Update the notification progress
-                    notificationBuilder.setProgress(100, progress, false)
-                    notificationManager.notify(notificationId, notificationBuilder.build())
-                    // Simulate some work being done
-                    withContext(Dispatchers.IO) {
-                        Thread.sleep(50)
-                    }
-                }
-
-                for (flashCard in listCard) {
-                    val term = flashCard.term ?: ""
-                    val definition = flashCard.definition ?: ""
-                    val content = "$term : $definition"
-
-                    val paragraph = document.createParagraph()
-                    val run = paragraph.createRun()
-                    run.setText(content)
-                }
-
-                // Specify the directory and filename for saving the DOCX file
-                val mDirectory = Environment.DIRECTORY_DOWNLOADS
-                val mFilename = SimpleDateFormat(
-                    "yyyyMMdd_HHmmss",
-                    Locale.getDefault()
-                ).format(System.currentTimeMillis())
-                val mFilePath = Environment.getExternalStoragePublicDirectory(mDirectory)
-                    .toString() + "/" + mFilename + ".docx"
-
-                // Save the DOCX document to a file
-                val outputStream = FileOutputStream(mFilePath)
-                document.write(outputStream)
-                outputStream.close()
-
-                runOnUiThread {
-                    Toast.makeText(
-                        requireContext()@StudySetDetail,
-                        "$mFilename.docx is created",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-                // Send broadcast when download is complete
-                runOnUiThread {
-                    val downloadCompleteIntent = Intent("PDF_DOWNLOAD_COMPLETE")
-                    downloadCompleteIntent.putExtra("file_path", mFilePath)
-                    requireContext()@StudySetDetail.sendBroadcast(downloadCompleteIntent)
-                }
-            } catch (e: Exception) {
-                Toast.makeText(requireContext()@StudySetDetail, e.message.toString(), Toast.LENGTH_SHORT)
-                    .show()
-            } finally {
-                // Remove the ongoing notification when the download is complete
-                notificationManager.cancel(notificationId)
-            }
-        }
+//        val notificationManager =
+//            requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//        val notificationId = 1
+//        val channelId = "download_channel"
+//        val channelName = "Download Channel"
+//
+//        val channel =
+//            NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW)
+//        notificationManager.createNotificationChannel(channel)
+//
+//        val notificationBuilder = NotificationCompat.Builder(requireContext(), channelId)
+//            .setContentTitle("Downloading DOCX")
+//            .setContentText("Download in progress")
+//            .setSmallIcon(R.drawable.icons8_download_24)
+//            .setPriority(NotificationCompat.PRIORITY_LOW)
+//            .setProgress(100, 0, true)
+//            .setOngoing(true)
+//
+//        notificationManager.notify(notificationId, notificationBuilder.build())
+//
+//        withContext(Dispatchers.IO) {
+//            try {
+//                val document = XWPFDocument()
+//
+//                for (progress in 1..100) {
+//                    // Update the notification progress
+//                    notificationBuilder.setProgress(100, progress, false)
+//                    notificationManager.notify(notificationId, notificationBuilder.build())
+//                    // Simulate some work being done
+//                    withContext(Dispatchers.IO) {
+//                        Thread.sleep(50)
+//                    }
+//                }
+//
+//                for (flashCard in listCard) {
+//                    val term = flashCard.term ?: ""
+//                    val definition = flashCard.definition ?: ""
+//                    val content = "$term : $definition"
+//
+//                    val paragraph = document.createParagraph()
+//                    val run = paragraph.createRun()
+//                    run.setText(content)
+//                }
+//
+//                // Specify the directory and filename for saving the DOCX file
+//                val mDirectory = Environment.DIRECTORY_DOWNLOADS
+//                val mFilename = SimpleDateFormat(
+//                    "yyyyMMdd_HHmmss",
+//                    Locale.getDefault()
+//                ).format(System.currentTimeMillis())
+//                val mFilePath = Environment.getExternalStoragePublicDirectory(mDirectory)
+//                    .toString() + "/" + mFilename + ".docx"
+//
+//                // Save the DOCX document to a file
+//                val outputStream = FileOutputStream(mFilePath)
+//                document.write(outputStream)
+//                outputStream.close()
+//
+//                runOnUiThread {
+//                    Toast.makeText(
+//                        requireContext()@StudySetDetail,
+//                        "$mFilename.docx is created",
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//                }
+//
+//                // Send broadcast when download is complete
+//                runOnUiThread {
+//                    val downloadCompleteIntent = Intent("PDF_DOWNLOAD_COMPLETE")
+//                    downloadCompleteIntent.putExtra("file_path", mFilePath)
+//                    requireContext()@StudySetDetail.sendBroadcast(downloadCompleteIntent)
+//                }
+//            } catch (e: Exception) {
+//                Toast.makeText(requireContext()@StudySetDetail, e.message.toString(), Toast.LENGTH_SHORT)
+//                    .show()
+//            } finally {
+//                // Remove the ongoing notification when the download is complete
+//                notificationManager.cancel(notificationId)
+//            }
+//        }
     }
 
     // Import necessary classes
     private suspend fun saveExcel(listCard: MutableList<FlashCardModel>) {
-        val notificationManager =
-            requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val notificationId = 1
-        val channelId = "download_channel"
-        val channelName = "Download Channel"
-
-        val channel =
-            NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW)
-        notificationManager.createNotificationChannel(channel)
-
-        val notificationBuilder = NotificationCompat.Builder(requireContext(), channelId)
-            .setContentTitle(resources.getString(R.string.download_excel))
-            .setContentText(resources.getString(R.string.download_in_progess))
-            .setSmallIcon(R.drawable.icons8_download_24)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setProgress(100, 0, true)
-            .setOngoing(true)
-
-        notificationManager.notify(notificationId, notificationBuilder.build())
-        withContext(Dispatchers.IO) {
-            try {
-                val workbook = HSSFWorkbook()
-                val sheet = workbook.createSheet(nameSet)
-
-                for (progress in 1..100) {
-                    // Update the notification progress
-                    notificationBuilder.setProgress(100, progress, false)
-                    notificationManager.notify(notificationId, notificationBuilder.build())
-                    // Simulate some work being done
-                    Thread.sleep(50)
-                }
-
-                for ((rowIndex, flashCard) in listCard.withIndex()) {
-                    val row = sheet.createRow(rowIndex)
-                    val termCell = row.createCell(0)
-                    val definitionCell = row.createCell(1)
-
-                    termCell.setCellValue(flashCard.term)
-                    definitionCell.setCellValue(flashCard.definition)
-                }
-
-                // Specify the directory and filename for saving the Excel file
-                val mDirectory = Environment.DIRECTORY_DOWNLOADS
-                val mFilename = SimpleDateFormat(
-                    "yyyyMMdd_HHmmss",
-                    Locale.getDefault()
-                ).format(System.currentTimeMillis())
-                val mFilePath = Environment.getExternalStoragePublicDirectory(mDirectory)
-                    .toString() + "/" + mFilename + ".xlsx"
-
-                // Write the workbook to a file
-                val fileOutputStream = FileOutputStream(mFilePath)
-                workbook.write(fileOutputStream)
-                fileOutputStream.close()
-
-                // Display a toast message
-                runOnUiThread {
-                    Toast.makeText(
-                        requireContext()@StudySetDetail,
-                        "$mFilename.xlsx is created",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-                // Send broadcast when download is complete
-                runOnUiThread {
-                    val downloadCompleteIntent = Intent("PDF_DOWNLOAD_COMPLETE")
-                    downloadCompleteIntent.putExtra("file_path", mFilePath)
-                    requireContext()@StudySetDetail.sendBroadcast(downloadCompleteIntent)
-                }
-
-                Log.d("saveExcel1", "error 1")
-            } catch (e: Exception) {
-                // Handle exceptions
-                Log.d("saveExcel", e.message.toString())
-                Toast.makeText(requireContext()@StudySetDetail, e.message.toString(), Toast.LENGTH_SHORT).show()
-            } finally {
-                // Remove the ongoing notification when the download is complete
-                notificationManager.cancel(notificationId)
-            }
-        }
+//        val notificationManager =
+//            requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//        val notificationId = 1
+//        val channelId = "download_channel"
+//        val channelName = "Download Channel"
+//
+//        val channel =
+//            NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW)
+//        notificationManager.createNotificationChannel(channel)
+//
+//        val notificationBuilder = NotificationCompat.Builder(requireContext(), channelId)
+//            .setContentTitle(resources.getString(R.string.download_excel))
+//            .setContentText(resources.getString(R.string.download_in_progess))
+//            .setSmallIcon(R.drawable.icons8_download_24)
+//            .setPriority(NotificationCompat.PRIORITY_LOW)
+//            .setProgress(100, 0, true)
+//            .setOngoing(true)
+//
+//        notificationManager.notify(notificationId, notificationBuilder.build())
+//        withContext(Dispatchers.IO) {
+//            try {
+//                val workbook = HSSFWorkbook()
+//                val sheet = workbook.createSheet(nameSet)
+//
+//                for (progress in 1..100) {
+//                    // Update the notification progress
+//                    notificationBuilder.setProgress(100, progress, false)
+//                    notificationManager.notify(notificationId, notificationBuilder.build())
+//                    // Simulate some work being done
+//                    Thread.sleep(50)
+//                }
+//
+//                for ((rowIndex, flashCard) in listCard.withIndex()) {
+//                    val row = sheet.createRow(rowIndex)
+//                    val termCell = row.createCell(0)
+//                    val definitionCell = row.createCell(1)
+//
+//                    termCell.setCellValue(flashCard.term)
+//                    definitionCell.setCellValue(flashCard.definition)
+//                }
+//
+//                // Specify the directory and filename for saving the Excel file
+//                val mDirectory = Environment.DIRECTORY_DOWNLOADS
+//                val mFilename = SimpleDateFormat(
+//                    "yyyyMMdd_HHmmss",
+//                    Locale.getDefault()
+//                ).format(System.currentTimeMillis())
+//                val mFilePath = Environment.getExternalStoragePublicDirectory(mDirectory)
+//                    .toString() + "/" + mFilename + ".xlsx"
+//
+//                // Write the workbook to a file
+//                val fileOutputStream = FileOutputStream(mFilePath)
+//                workbook.write(fileOutputStream)
+//                fileOutputStream.close()
+//
+//                // Display a toast message
+//                runOnUiThread {
+//                    Toast.makeText(
+//                        requireContext()@StudySetDetail,
+//                        "$mFilename.xlsx is created",
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//                }
+//
+//                // Send broadcast when download is complete
+//                runOnUiThread {
+//                    val downloadCompleteIntent = Intent("PDF_DOWNLOAD_COMPLETE")
+//                    downloadCompleteIntent.putExtra("file_path", mFilePath)
+//                    requireContext()@StudySetDetail.sendBroadcast(downloadCompleteIntent)
+//                }
+//
+//                Log.d("saveExcel1", "error 1")
+//            } catch (e: Exception) {
+//                // Handle exceptions
+//                Log.d("saveExcel", e.message.toString())
+//                Toast.makeText(requireContext()@StudySetDetail, e.message.toString(), Toast.LENGTH_SHORT).show()
+//            } finally {
+//                // Remove the ongoing notification when the download is complete
+//                notificationManager.cancel(notificationId)
+//            }
+//        }
     }
 
 
@@ -303,17 +305,17 @@ class StudySetDetail : Fragment(), TextToSpeech.OnInitListener,
 //        adapterFlashcardDetail.notifyDataSetChanged()
 //    }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater: MenuInflater = menuInflater
-        inflater.inflate(R.menu.menu_study_set, menu)
-        val publicMenuItem: MenuItem? = menu.findItem(R.id.option_public)
-        publicMenuItem?.title = if (isPublic == true) {
-            resources.getString(R.string.disable_public_set)
-        } else {
-            resources.getString(R.string.public_set)
-        }
-        return true
-    }
+//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+//        val inflater: MenuInflater = menuInflater
+//        inflater.inflate(R.menu.menu_study_set, menu)
+//        val publicMenuItem: MenuItem? = menu.findItem(R.id.option_public)
+//        publicMenuItem?.title = if (isPublic == true) {
+//            resources.getString(R.string.disable_public_set)
+//        } else {
+//            resources.getString(R.string.public_set)
+//        }
+//        return true
+//    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -379,25 +381,25 @@ class StudySetDetail : Fragment(), TextToSpeech.OnInitListener,
     }
 
     private fun disablePublicSet(userId: String, setId: String) {
-        lifecycleScope.launch {
-            try {
-                showLoading(resources.getString(R.string.privating_set))
-                apiService.disablePublicSet(userId, setId)
-                isPublic = false
-                CustomToast(requireContext()@StudySetDetail).makeText(
-                    requireContext()@StudySetDetail,
-                    resources.getString(R.string.set_is_private),
-                    CustomToast.LONG,
-                    CustomToast.SUCCESS
-                ).show()
-            } catch (e: Exception) {
-                CustomToast(requireContext()@StudySetDetail).makeText(
-                    requireContext()@StudySetDetail, e.message.toString(), CustomToast.LONG, CustomToast.ERROR
-                ).show()
-            } finally {
-                progressDialog.dismiss()
-            }
-        }
+//        lifecycleScope.launch {
+//            try {
+//                showLoading(resources.getString(R.string.privating_set))
+//                apiService.disablePublicSet(userId, setId)
+//                isPublic = false
+//                CustomToast(requireContext()).makeText(
+//                    requireContext(),
+//                    resources.getString(R.string.set_is_private),
+//                    CustomToast.LONG,
+//                    CustomToast.SUCCESS
+//                ).show()
+//            } catch (e: Exception) {
+//                CustomToast(requireContext()).makeText(
+//                    requireContext(), e.message.toString(), CustomToast.LONG, CustomToast.ERROR
+//                ).show()
+//            } finally {
+//                progressDialog.dismiss()
+//            }
+//        }
     }
 
 
@@ -439,7 +441,7 @@ class StudySetDetail : Fragment(), TextToSpeech.OnInitListener,
 
     private fun showDeleteDialog(desc: String) {
         val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle(title)
+//        builder.setTitle(title)
         builder.setMessage(desc)
         builder.setPositiveButton(resources.getString(R.string.delete)) { dialog, _ ->
             deleteStudySet(Helper.getDataUserId(requireContext()), setId)
@@ -452,44 +454,44 @@ class StudySetDetail : Fragment(), TextToSpeech.OnInitListener,
     }
 
     private fun deleteStudySet(userId: String, setId: String) {
-        lifecycleScope.launch {
-            showLoading(resources.getString(R.string.deleteFolderLoading))
-            try {
-                val result = apiService.deleteStudySet(userId, setId)
-                if (result.isSuccessful) {
-
-                    result.body().let {
-                        if (it != null) {
-                            CustomToast(requireContext()@StudySetDetail).makeText(
-                                requireContext()@StudySetDetail,
-                                resources.getString(R.string.deleteSetSuccessful),
-                                CustomToast.LONG,
-                                CustomToast.SUCCESS
-                            ).show()
-                            UserM.setUserData(it)
-                        }
-                    }
-                    val i = Intent(requireContext()@StudySetDetail, MainActivity_Logged_In::class.java)
-                    i.putExtra("selectedFragment", "Library")
-                    i.putExtra("createMethod", "createSet")
-                    startActivity(i)
-                } else {
-                    CustomToast(requireContext()@StudySetDetail).makeText(
-                        requireContext()@StudySetDetail,
-                        resources.getString(R.string.deleteSetErr),
-                        CustomToast.LONG,
-                        CustomToast.ERROR
-                    ).show()
-
-                }
-            } catch (e: Exception) {
-                CustomToast(requireContext()@StudySetDetail).makeText(
-                    requireContext()@StudySetDetail, e.message.toString(), CustomToast.LONG, CustomToast.ERROR
-                ).show()
-            } finally {
-                progressDialog.dismiss()
-            }
-        }
+//        lifecycleScope.launch {
+//            showLoading(resources.getString(R.string.deleteFolderLoading))
+//            try {
+//                val result = apiService.deleteStudySet(userId, setId)
+//                if (result.isSuccessful) {
+//
+//                    result.body().let {
+//                        if (it != null) {
+//                            CustomToast(requireContext()@StudySetDetail).makeText(
+//                                requireContext()@StudySetDetail,
+//                                resources.getString(R.string.deleteSetSuccessful),
+//                                CustomToast.LONG,
+//                                CustomToast.SUCCESS
+//                            ).show()
+//                            UserM.setUserData(it)
+//                        }
+//                    }
+//                    val i = Intent(requireContext(), MainActivity::class.java)
+//                    i.putExtra("selectedFragment", "Library")
+//                    i.putExtra("createMethod", "createSet")
+//                    startActivity(i)
+//                } else {
+//                    CustomToast(requireContext()@StudySetDetail).makeText(
+//                        requireContext(),
+//                        resources.getString(R.string.deleteSetErr),
+//                        CustomToast.LONG,
+//                        CustomToast.ERROR
+//                    ).show()
+//
+//                }
+//            } catch (e: Exception) {
+//                CustomToast(requireContext()).makeText(
+//                    requireContext(), e.message.toString(), CustomToast.LONG, CustomToast.ERROR
+//                ).show()
+//            } finally {
+//                progressDialog.dismiss()
+//            }
+//        }
     }
 
 
@@ -521,7 +523,7 @@ class StudySetDetail : Fragment(), TextToSpeech.OnInitListener,
             textToSpeech.shutdown()
         }
         textToSpeech.shutdown()
-        unregisterReceiver(downloadCompleteReceiver)
+//        unregisterReceiver(downloadCompleteReceiver)
         super.onDestroy()
     }
 
@@ -531,7 +533,7 @@ class StudySetDetail : Fragment(), TextToSpeech.OnInitListener,
 
     override fun onClickZoomBtn() {
         val jsonList = Gson().toJson(listCards)
-        val i = Intent(applicationContext, FlashcardLearn::class.java)
+        val i = Intent(requireContext(), FlashcardLearn::class.java)
         i.putExtra("listCard", jsonList)
         startActivity(i)
     }
@@ -544,26 +546,26 @@ class StudySetDetail : Fragment(), TextToSpeech.OnInitListener,
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun detectContinueStudy(userId: String, timeDetect: Long) {
-        lifecycleScope.launch {
-            try {
-                val result = apiService.detectContinueStudy(userId, timeDetect)
-                if (result.isSuccessful) {
-                    result.body()?.let {
-                        val editor = sharedPreferencesDetect.edit()
-                        editor.putInt("countLearn", 1)
-                        editor.apply()
-                        UserM.setDataAchievements(it)
-                        val congratulationsPopup =
-                            CustomPopUpWindow(requireContext()@StudySetDetail, it.streak.currentStreak)
-                        congratulationsPopup.showCongratulationsPopup()
-                    }
-                } else {
-                    Log.d("error", result.errorBody().toString())
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+//        lifecycleScope.launch {
+//            try {
+//                val result = apiService.detectContinueStudy(userId, timeDetect)
+//                if (result.isSuccessful) {
+//                    result.body()?.let {
+//                        val editor = sharedPreferencesDetect.edit()
+//                        editor.putInt("countLearn", 1)
+//                        editor.apply()
+////                        UserM.setDataAchievements(it)
+//                        val congratulationsPopup =
+//                            CustomPopUpWindow(requireContext(), it.streak.currentStreak)
+//                        congratulationsPopup.showCongratulationsPopup()
+//                    }
+//                } else {
+//                    Log.d("error", result.errorBody().toString())
+//                }
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//            }
+//        }
     }
 
 }

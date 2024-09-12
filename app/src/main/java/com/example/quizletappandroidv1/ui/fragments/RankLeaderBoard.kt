@@ -1,35 +1,17 @@
 package com.example.quizletappandroidv1.ui.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.example.quizletappandroidv1.R
+import com.example.quizletappandroidv1.customview.RankView
+import com.example.quizletappandroidv1.models.RankItemModel
+import com.example.quizletappandroidv1.models.RankResultModel
+import com.example.quizletappandroidv1.models.RankSystem
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [RankLeaderBoard.newInstance] factory method to
- * create an instance of this fragment.
- */
 class RankLeaderBoard : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -38,23 +20,28 @@ class RankLeaderBoard : Fragment() {
         return inflater.inflate(R.layout.fragment_rank_leader_board, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment RankLeaderBoard.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            RankLeaderBoard().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val rankView = view.findViewById<RankView>(R.id.rankView)
+
+        // Set ranks, these could be fetched from an API or database
+        rankView.setTopRanks(
+            "1.66 points",
+            "391.19K points",
+            "309.07K points",
+            R.raw.top1_removebg_preview,
+            R.raw.t2_removebg_preview,
+            R.raw.t3_removebg_preview
+        )
+
+        // Set other ranks
+        val otherRanks = listOf(
+           RankResultModel(100, 1,RankSystem(listOf(RankItemModel(21,1,"lemanh","lemanh@gmail.com","05/09/2002",1)))),
+           RankResultModel(100, 2,RankSystem(listOf(RankItemModel(21,1,"lemanh","lemanh@gmail.com","05/09/2002",1)))),
+           RankResultModel(100, 3,RankSystem(listOf(RankItemModel(21,1,"lemanh","lemanh@gmail.com","05/09/2002",1)))),
+        )
+        rankView.setOtherRanks(otherRanks)
     }
+
+
 }

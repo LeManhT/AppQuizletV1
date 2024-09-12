@@ -197,100 +197,106 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent" />
 
-                        <RelativeLayout
+                        <!--                        <RelativeLayout-->
+                        <!--                            android:layout_width="match_parent"-->
+                        <!--                            android:layout_height="wrap_content"-->
+                        <!--                            android:fitsSystemWindows="true"-->
+                        <!--                            android:orientation="vertical"-->
+                        <!--                            tools:context=".other.AddCourseHome">-->
+
+
+                        <!--                            <LinearLayout-->
+                        <!--                                android:id="@+id/layoutTop1"-->
+                        <!--                                android:layout_width="wrap_content"-->
+                        <!--                                android:layout_height="wrap_content"-->
+                        <!--                                android:layout_alignParentStart="true"-->
+                        <!--                                android:layout_alignParentEnd="true"-->
+                        <!--                                android:gravity="center"-->
+                        <!--                                android:orientation="vertical">-->
+
+                        <!--                                <ImageView-->
+                        <!--                                    android:layout_width="100dp"-->
+                        <!--                                    android:layout_height="80dp"-->
+                        <!--                                    android:src="@raw/top1_removebg_preview" />-->
+
+
+                        <!--                                <TextView-->
+                        <!--                                    android:id="@+id/txtTop1NameHome"-->
+                        <!--                                    android:layout_width="80dp"-->
+                        <!--                                    android:layout_height="wrap_content"-->
+                        <!--                                    android:ellipsize="end"-->
+                        <!--                                    android:maxLines="1"-->
+                        <!--                                    android:text="@string/username"-->
+                        <!--                                    android:textAlignment="center"-->
+                        <!--                                    android:textSize="15sp"-->
+                        <!--                                    android:textStyle="bold" />-->
+
+                        <!--                            </LinearLayout>-->
+
+                        <!--                            <LinearLayout-->
+                        <!--                                android:id="@+id/layoutTop2"-->
+                        <!--                                android:layout_width="wrap_content"-->
+                        <!--                                android:layout_height="wrap_content"-->
+                        <!--                                android:layout_alignParentStart="true"-->
+                        <!--                                android:layout_marginStart="20dp"-->
+                        <!--                                android:layout_marginTop="@dimen/mar_80"-->
+                        <!--                                android:gravity="center"-->
+                        <!--                                android:orientation="vertical">-->
+
+                        <!--                                <ImageView-->
+                        <!--                                    android:layout_width="100dp"-->
+                        <!--                                    android:layout_height="80dp"-->
+                        <!--                                    android:src="@raw/t2_removebg_preview" />-->
+
+                        <!--                                <TextView-->
+                        <!--                                    android:id="@+id/txtTop2NameHome"-->
+                        <!--                                    android:layout_width="80dp"-->
+                        <!--                                    android:layout_height="wrap_content"-->
+                        <!--                                    android:ellipsize="end"-->
+                        <!--                                    android:maxLines="1"-->
+                        <!--                                    android:text="@string/username"-->
+                        <!--                                    android:textAlignment="center"-->
+                        <!--                                    android:textSize="15sp"-->
+                        <!--                                    android:textStyle="bold" />-->
+                        <!--                            </LinearLayout>-->
+
+                        <!--                            <LinearLayout-->
+                        <!--                                android:id="@+id/layoutTop3"-->
+                        <!--                                android:layout_width="wrap_content"-->
+                        <!--                                android:layout_height="wrap_content"-->
+                        <!--                                android:layout_alignParentEnd="true"-->
+                        <!--                                android:layout_marginTop="100dp"-->
+                        <!--                                android:layout_marginEnd="20sp"-->
+                        <!--                                android:gravity="center"-->
+                        <!--                                android:orientation="vertical">-->
+
+
+                        <!--                                <ImageView-->
+                        <!--                                    android:layout_width="100dp"-->
+                        <!--                                    android:layout_height="80dp"-->
+                        <!--                                    android:src="@raw/t3_removebg_preview" />-->
+
+
+                        <!--                                <TextView-->
+                        <!--                                    android:id="@+id/txtTop3NameHome"-->
+                        <!--                                    android:layout_width="80dp"-->
+                        <!--                                    android:layout_height="wrap_content"-->
+                        <!--                                    android:ellipsize="end"-->
+                        <!--                                    android:maxLines="1"-->
+                        <!--                                    android:text="@string/username"-->
+                        <!--                                    android:textAlignment="center"-->
+                        <!--                                    android:textSize="15sp"-->
+                        <!--                                    android:textStyle="bold" />-->
+
+                        <!--                            </LinearLayout>-->
+
+                        <!--                        </RelativeLayout>-->
+
+                        <com.example.quizletappandroidv1.customview.PodiumView
+                            android:id="@+id/podiumView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:fitsSystemWindows="true"
-                            android:orientation="vertical"
-                            tools:context=".other.AddCourseHome">
-
-
-                            <LinearLayout
-                                android:id="@+id/layoutTop1"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentStart="true"
-                                android:layout_alignParentEnd="true"
-                                android:gravity="center"
-                                android:orientation="vertical">
-
-                                <ImageView
-                                    android:layout_width="100dp"
-                                    android:layout_height="80dp"
-                                    android:src="@raw/top1_removebg_preview" />
-
-
-                                <TextView
-                                    android:id="@+id/txtTop1NameHome"
-                                    android:layout_width="80dp"
-                                    android:layout_height="wrap_content"
-                                    android:ellipsize="end"
-                                    android:maxLines="1"
-                                    android:text="@string/username"
-                                    android:textAlignment="center"
-                                    android:textSize="15sp"
-                                    android:textStyle="bold" />
-
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:id="@+id/layoutTop2"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentStart="true"
-                                android:layout_marginStart="20dp"
-                                android:layout_marginTop="@dimen/mar_80"
-                                android:gravity="center"
-                                android:orientation="vertical">
-
-                                <ImageView
-                                    android:layout_width="100dp"
-                                    android:layout_height="80dp"
-                                    android:src="@raw/t2_removebg_preview" />
-
-                                <TextView
-                                    android:id="@+id/txtTop2NameHome"
-                                    android:layout_width="80dp"
-                                    android:layout_height="wrap_content"
-                                    android:ellipsize="end"
-                                    android:maxLines="1"
-                                    android:text="@string/username"
-                                    android:textAlignment="center"
-                                    android:textSize="15sp"
-                                    android:textStyle="bold" />
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:id="@+id/layoutTop3"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentEnd="true"
-                                android:layout_marginTop="100dp"
-                                android:layout_marginEnd="20sp"
-                                android:gravity="center"
-                                android:orientation="vertical">
-
-
-                                <ImageView
-                                    android:layout_width="100dp"
-                                    android:layout_height="80dp"
-                                    android:src="@raw/t3_removebg_preview" />
-
-
-                                <TextView
-                                    android:id="@+id/txtTop3NameHome"
-                                    android:layout_width="80dp"
-                                    android:layout_height="wrap_content"
-                                    android:ellipsize="end"
-                                    android:maxLines="1"
-                                    android:text="@string/username"
-                                    android:textAlignment="center"
-                                    android:textSize="15sp"
-                                    android:textStyle="bold" />
-
-                            </LinearLayout>
-
-                        </RelativeLayout>
+                            android:fitsSystemWindows="true" />
 
                         <androidx.appcompat.widget.AppCompatButton
                             android:id="@+id/btnOpenRankLeaderBoard"
@@ -382,7 +388,6 @@
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="16dp"
                             android:gravity="center"
-
                             android:text="@string/pf_achievement_quote"
                             android:textColor="@color/txt_black_primary" />
 
@@ -398,7 +403,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:layout_gravity="center"
-                                android:layout_marginHorizontal="@dimen/pad_30"
+                                android:layout_marginHorizontal="@dimen/mar_30"
                                 android:padding="@dimen/mar_10" />
 
                             <androidx.cardview.widget.CardView
@@ -414,6 +419,7 @@
                                 <androidx.recyclerview.widget.RecyclerView
                                     android:id="@+id/rv_custom_date_picker"
                                     android:layout_width="match_parent"
+                                    android:layout_marginHorizontal="@dimen/pad_20"
                                     android:layout_height="match_parent"
                                     android:layout_gravity="center" />
 

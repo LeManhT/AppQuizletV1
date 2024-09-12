@@ -7,6 +7,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Build
+import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
 import androidx.annotation.RequiresApi
@@ -26,6 +27,8 @@ import java.util.Base64
 import java.util.Locale
 
 object Helper {
+    const val EMPTY_STRING = ""
+
     fun formatDateSignup(inputDate: String): String {
         val inputFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
         val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -172,6 +175,26 @@ object Helper {
 //        random.nextBytes(salt)
 //        return Base64.getEncoder().encodeToString(salt)
 //    }
+
+    fun View.makeVisible() {
+        this.visibility = View.VISIBLE
+    }
+
+    fun View.makeGone() {
+        this.visibility = View.GONE
+    }
+
+    fun makeVisible(vararg views: View) {
+        for (view in views) {
+            view.visibility = View.VISIBLE
+        }
+    }
+
+    fun makeGone(vararg views: View) {
+        for (view in views) {
+            view.visibility = View.GONE
+        }
+    }
 
 
 }

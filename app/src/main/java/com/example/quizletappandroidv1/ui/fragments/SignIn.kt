@@ -16,6 +16,7 @@ import com.example.quizletappandroidv1.MainActivity
 import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.custom.CustomToast
 import com.example.quizletappandroidv1.databinding.FragmentSignInBinding
+import com.example.quizletappandroidv1.utils.UserSession
 import com.example.quizletappandroidv1.viewmodel.user.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.regex.Pattern
@@ -56,7 +57,10 @@ class SignIn : Fragment(), View.OnFocusChangeListener {
         super.onViewCreated(view, savedInstanceState)
 
         userViewModel.loginResult.observe(viewLifecycleOwner) { result ->
+            hideLoading()
             result.onSuccess { userResponse ->
+                UserSession.saveUserId(requireContext(), userResponse.id)
+//                userViewModel.setUserResponse(result)
                 val intent = Intent(requireContext(), MainActivity::class.java)
                 startActivity(intent)
             }.onFailure { exception ->
@@ -72,9 +76,10 @@ class SignIn : Fragment(), View.OnFocusChangeListener {
         binding.btnSignin.setOnClickListener {
             val email = binding.edtEmail.text.toString()
             val pass = binding.edtPass.text.toString()
-            val intent = Intent(requireContext(), MainActivity::class.java)
-            startActivity(intent)
+//            val intent = Intent(requireContext(), MainActivity::class.java)
+//            startActivity(intent)
             if (validateEmail(email) && validatePass(pass)) {
+                showLoading()
                 userViewModel.loginUser(email, pass)
             } else {
                 CustomToast(requireContext()).makeText(
@@ -113,6 +118,17 @@ class SignIn : Fragment(), View.OnFocusChangeListener {
             }
         }
     }
+
+    private fun showLoading() {
+        binding.progressBar.visibility = View.VISIBLE
+        binding.btnSignin.visibility = View.GONE
+    }
+
+    private fun hideLoading() {
+        binding.progressBar.visibility = View.GONE
+        binding.btnSignin.visibility = View.VISIBLE
+    }
+
 
     private fun validateEmail(email: String): Boolean {
         var errorMess: String? = null

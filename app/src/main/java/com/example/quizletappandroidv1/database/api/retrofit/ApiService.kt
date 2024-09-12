@@ -138,11 +138,11 @@ interface ApiService {
         @Body body: MutableSet<String>
     ): Response<UserResponse>
 
-//    @PUT("User/UpdateInfo")
-//    suspend fun updateUserInfoNoImg(
-//        @Query("userId") userId: String,
-//        @Body body: JsonObject
-//    ): Response<UpdateUserResponse>
+    @PUT("User/UpdateInfo")
+    suspend fun updateUserInfoNoImg(
+        @Query("userId") userId: String,
+        @Body body: JsonObject
+    ): Response<UserResponse>
 
     @PUT("User/ChangePassword")
     suspend fun changePassword(

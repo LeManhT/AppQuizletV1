@@ -11,6 +11,9 @@
         <action
             android:id="@+id/action_signIn2_to_startAppFragment"
             app:destination="@id/startAppFragment" />
+        <action
+            android:id="@+id/action_signIn2_to_signUp2"
+            app:destination="@id/signUp2" />
     </fragment>
     <fragment
         android:id="@+id/signUp2"
@@ -19,6 +22,9 @@
         <action
             android:id="@+id/action_signUp2_to_startAppFragment"
             app:destination="@id/startAppFragment" />
+        <action
+            android:id="@+id/action_signUp2_to_signIn2"
+            app:destination="@id/signIn2" />
     </fragment>
     <fragment
         android:id="@+id/startAppFragment"

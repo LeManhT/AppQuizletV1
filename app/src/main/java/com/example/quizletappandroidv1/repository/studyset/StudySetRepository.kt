@@ -1,4 +1,8 @@
 package com.example.quizletappandroidv1.repository.studyset
 
-class StudySetRepository {
+import com.example.quizletappandroidv1.database.api.retrofit.ApiService
+import javax.inject.Inject
+
+class StudySetRepository @Inject constructor(val apiService: ApiService) {
+
 }

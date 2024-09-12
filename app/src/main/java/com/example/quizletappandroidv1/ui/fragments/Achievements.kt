@@ -1,60 +1,125 @@
 package com.example.quizletappandroidv1.ui.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.quizletappandroidv1.R
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.GridLayoutManager
+import com.example.quizletappandroidv1.MyApplication
+import com.example.quizletappandroidv1.adapter.AchievementAdapter
+import com.example.quizletappandroidv1.databinding.FragmentAchievementsBinding
+import com.example.quizletappandroidv1.viewmodel.home.HomeViewModel
+import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalDate
+import java.time.YearMonth
+import java.time.format.TextStyle
+import java.util.Locale
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [Achievements.newInstance] factory method to
- * create an instance of this fragment.
- */
+@AndroidEntryPoint
 class Achievements : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var binding: FragmentAchievementsBinding
+    private lateinit var adapterAchievementStudySet: AchievementAdapter
+    private lateinit var adapterAchievementStreak: AchievementAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    val userId = MyApplication.userId
+    val timeDetect = System.currentTimeMillis()
+
+    private val homeViewModel: HomeViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_achievements, container, false)
+        binding = FragmentAchievementsBinding.inflate(layoutInflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment Achievements.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            Achievements().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        if (userId != null) {
+            homeViewModel.getDataAchievement(userId, timeDetect)
+        }
+
+        binding.btcCloseAchievement.setOnClickListener {
+            requireActivity().finish()
+        }
+
+        homeViewModel.dataAchievement.observe(viewLifecycleOwner) { result ->
+
+            result.onSuccess {
+                binding.txtCurrentStreak.text =
+                    "Current streak : ${it.streak.currentStreak}-days streak"
+                val listStreak = it.achievement.taskList.filter { it.type == "Streak" }
+                val listStudy = it.achievement.taskList.filter { it.type == "Study" }
+                Log.d("streak", Gson().toJson(listStreak))
+                binding.rvAchievementStreak.layoutManager =
+                    GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
+                binding.rvAchievementStudy.adapter = adapterAchievementStudySet
+
+
+                adapterAchievementStreak = AchievementAdapter(listStudy, requireContext(), 2)
+                binding.rvAchievementStudy.layoutManager =
+                    GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
+                binding.rvAchievementStreak.adapter = adapterAchievementStreak
+            }.onFailure {
+
             }
+
+        }
+
+        binding.btnViewMoreLessStudy.setOnClickListener {
+            adapterAchievementStudySet.setIsExpaned()
+            val buttonText = if (adapterAchievementStudySet.isExpanded) "View Less" else "View More"
+            binding.btnViewMoreLessStudy.text = buttonText
+        }
+        binding.btnViewMoreLessStreak.setOnClickListener {
+            adapterAchievementStreak.setIsExpandStreak()
+            val buttonText =
+                if (adapterAchievementStreak.isExpandedStreak) "View Less" else "View More"
+            binding.btnViewMoreLessStreak.text = buttonText
+        }
+
+
+        // Lấy ngày hiện tại
+        val currentDate = LocalDate.now()
+
+        // Lấy tháng hiện tại
+        val currentMonth = YearMonth.from(currentDate)
+
+        // Lấy ngày đầu tiên của tháng
+        val firstDayOfMonth = currentMonth.atDay(1)
+
+        // Lấy ngày cuối cùng của tháng
+        val lastDayOfMonth = currentMonth.atEndOfMonth()
+        // Định dạng ngày và tháng
+        val firstDayString = formatDayMonth(firstDayOfMonth)
+        val lastDayString = formatDayMonth(lastDayOfMonth)
+        val result = "$firstDayString - $lastDayString"
+
+        binding.txtDateFrom.text = result
+
+
+        // Tạo danh sách ngày từ ngày đầu tiên đến ngày cuối cùng của tháng
+        val daysInMonth = mutableListOf<LocalDate>()
+        var currentDay = firstDayOfMonth
+
+        while (!currentDay.isAfter(lastDayOfMonth)) {
+            daysInMonth.add(currentDay)
+            currentDay = currentDay.plusDays(1)
+        }
+
     }
+
+    fun formatDayMonth(date: LocalDate): String {
+        val dayOfMonth = date.dayOfMonth
+        val month = date.month.getDisplayName(TextStyle.FULL, Locale.ENGLISH)
+
+        return "$dayOfMonth $month"
+    }
+
 }

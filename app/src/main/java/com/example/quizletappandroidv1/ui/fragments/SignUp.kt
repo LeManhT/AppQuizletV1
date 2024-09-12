@@ -13,7 +13,6 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
-import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
@@ -211,8 +210,7 @@ class SignUp : Fragment(), View.OnFocusChangeListener {
             result.onSuccess {
                 // Handle success
                 val msgSignInSuccess = getString(R.string.sign_up_success)
-                val intent = Intent(requireContext(), SignIn::class.java)
-                startActivity(intent)
+                findNavController().navigate(R.id.action_signUp2_to_signIn2)
                 CustomToast(requireContext()).makeText(
                     requireContext(),
                     msgSignInSuccess,
