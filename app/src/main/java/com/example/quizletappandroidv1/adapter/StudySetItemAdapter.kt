@@ -14,7 +14,6 @@ import com.example.quizletappandroidv1.models.FlashCardModel
 import com.example.quizletappandroidv1.utils.Helper
 
 class StudySetItemAdapter(
-    private val listStudySet: List<FlashCardModel>,
     private val onClickFlashCard: RvFlashCard,
     private var onClickBtnZoomListener: ClickZoomListener? = null
 ) : RecyclerView.Adapter<StudySetItemAdapter.StudySetItemHolder>() {
@@ -23,6 +22,9 @@ class StudySetItemAdapter(
     interface ClickZoomListener {
         fun onClickZoomBtn()
     }
+
+    private var listStudySet: List<FlashCardModel> = mutableListOf()
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StudySetItemHolder {
         val view = LayoutInflater.from(parent.context)
@@ -54,6 +56,11 @@ class StudySetItemAdapter(
 
     override fun getItemCount(): Int {
         return listStudySet.size
+    }
+
+    fun updateData(newList: List<FlashCardModel>) {
+        listStudySet = newList
+        notifyDataSetChanged()
     }
 
     fun setOnClickZoomBtnListener (listener : ClickZoomListener) {

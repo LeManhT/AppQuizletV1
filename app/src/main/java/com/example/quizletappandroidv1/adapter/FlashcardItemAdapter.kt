@@ -10,13 +10,16 @@ import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.models.FlashCardModel
 
 class FlashcardItemAdapter(
-    private val listFlashcard: List<FlashCardModel>,
     private var itemClickListener: OnFlashcardItemClickListener? = null
 ) : RecyclerView.Adapter<FlashcardItemAdapter.FlashcardItemHolder>() {
     class FlashcardItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     interface OnFlashcardItemClickListener {
         fun onFlashcardItemClick(term: String)
     }
+
+    private var listFlashcard: List<FlashCardModel> = mutableListOf()
+
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FlashcardItemHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.layout_flashcard_detail, parent, false)
@@ -41,6 +44,11 @@ class FlashcardItemAdapter(
         }
 
 
+    }
+
+    fun updateData(newList: List<FlashCardModel>) {
+        this.listFlashcard = newList
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {

@@ -64,7 +64,7 @@ class RankView @JvmOverloads constructor(
             // Assuming rankList[i] provides an object that has rankSystem, currentScore, and currentRank properties
             val rank = rankList[i]
             Log.d("RANKADĐ", Gson().toJson(rank))
-            rankTextView.text = rank.rankSystem.userRanking[0].userName
+            rankTextView.text = rank.rankSystem.userRanking[i].userName
             rankPoint.text = rank.currentScore.toString()
             rankOrder.text = rank.currentRank.toString()
 

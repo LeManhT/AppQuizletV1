@@ -1,20 +1,21 @@
 package com.example.quizletappandroidv1.adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.databinding.RankLeaderBoardItemBinding
 import com.example.quizletappandroidv1.models.RankItemModel
 import com.example.quizletappandroidv1.utils.Helper
 
 class RankItemAdapter(
-    private var listItemRank: List<RankItemModel>,
     private val context: Context,
 ) : RecyclerView.Adapter<RankItemAdapter.RankItemHolder>() {
-
+    private var listItemRank: List<RankItemModel> = mutableListOf()
     var isExpanded: Boolean = false
 
     inner class RankItemHolder(val binding: RankLeaderBoardItemBinding) :
@@ -40,19 +41,20 @@ class RankItemAdapter(
         listItemRank[position].order = position + 1
         val imageName = "medal_${position + 1}"
         val imageResourceId =
-            context.resources.getIdentifier(imageName, "drawable", context.packageName)
+            context.resources.getIdentifier(imageName, "raw", context.packageName)
         if (position == 0 || position == 1 || position == 2) {
             imgTopOrder.visibility = View.VISIBLE
             imgTopOrder.setImageResource(imageResourceId)
             txtOrder.visibility = View.GONE
         }
         if(Helper.getDataUsername(context) == listItemRank[position].userName || Helper.getDataUsername(context) == listItemRank[position].email) {
-            txtTopName.text = "Me"
+            txtTopName.text = context.getString(R.string.me)
         } else {
             txtTopName.text = currentItem.userName
         }
         txtPoint.text = currentItem.score.toString()
-        txtOrder.text = (position + 1).toString()
+        Log.d("TAG", "onBindViewHolder: ${listItemRank[position].order} position : ${position}")
+        (position + 1).toString().also { txtOrder.text = it }
 //        imgAvatar.setImageResource(currentItem.topUserImage)
 
         holder.itemView.apply {
@@ -83,5 +85,10 @@ class RankItemAdapter(
 //            (context as AppCompatActivity).supportFragmentManager,
 //            addBottomSheet.tag
 //        )
+    }
+
+    fun updateData(list: List<RankItemModel>) {
+        listItemRank = list
+        notifyDataSetChanged()
     }
 }

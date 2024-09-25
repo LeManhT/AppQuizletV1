@@ -1,60 +1,71 @@
 package com.example.quizletappandroidv1.ui.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
+import com.example.appquizlet.adapter.ViewPagerLibAdapter
 import com.example.quizletappandroidv1.R
+import com.example.quizletappandroidv1.databinding.FragmentLibraryBinding
+import com.example.quizletappandroidv1.viewmodel.studyset.DocumentViewModel
+import com.google.android.material.tabs.TabLayoutMediator
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [FragmentLibrary.newInstance] factory method to
- * create an instance of this fragment.
- */
 class FragmentLibrary : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var binding: FragmentLibraryBinding
+    private lateinit var navController: NavController
+    private lateinit var adapter: ViewPagerLibAdapter
+    private val documentViewModel: DocumentViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_library, container, false)
+        binding = FragmentLibraryBinding.inflate(layoutInflater, container, false)
+
+// Set up NavController using the fragment's parent fragment manager
+        navController = findNavController()
+
+// Set up ViewPager and TabLayout
+        setupViewPager()
+
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FragmentLibrary.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FragmentLibrary().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
     }
+
+    private fun setupViewPager() {
+// Create the adapter
+        adapter = ViewPagerLibAdapter(childFragmentManager, lifecycle)
+
+// Set up the ViewPager2 with the adapter
+        binding.pagerLib.adapter = adapter
+
+// Link the TabLayout with ViewPager2
+        TabLayoutMediator(binding.tabLib, binding.pagerLib) { tab, position ->
+            when (position) {
+                0 -> tab.text = getString(R.string.lb_study_sets)
+                1 -> tab.text = getString(R.string.folders)
+            }
+        }.attach()
+
+// Handle tab changes and trigger navigation
+//        binding.pagerLib.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+//            override fun onPageSelected(position: Int) {
+//                super.onPageSelected(position)
+//                // Navigate to the appropriate fragment based on tab selection
+//                when (position) {
+//                    0 -> navController.navigate(R.id.fragmentStudySets)
+//                    1 -> navController.navigate(R.id.fragmentFolders)
+//                }
+//            }
+//        })
+    }
+
+
 }

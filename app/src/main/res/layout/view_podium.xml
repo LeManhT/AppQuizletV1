@@ -37,6 +37,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Emma Wills"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textColor="@android:color/black"
                 android:textSize="16sp" />
 
@@ -73,6 +75,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Sally Smith"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textColor="@android:color/black"
                 android:textSize="16sp" />
 
@@ -109,6 +113,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="John Doe"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textColor="@android:color/black"
                 android:textSize="16sp" />
 

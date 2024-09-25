@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +17,7 @@ import com.example.quizletappandroidv1.MainActivity
 import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.custom.CustomToast
 import com.example.quizletappandroidv1.databinding.FragmentSignInBinding
+import com.example.quizletappandroidv1.ui.admin.ActivityAdminDashboard
 import com.example.quizletappandroidv1.utils.UserSession
 import com.example.quizletappandroidv1.viewmodel.user.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -116,6 +118,12 @@ class SignIn : Fragment(), View.OnFocusChangeListener {
                     }
                 }
             }
+        }
+
+        binding.txtTermsOfService.setOnClickListener {
+            val intent = Intent(requireContext(), ActivityAdminDashboard::class.java)
+            Log.d("Admin","Vaooo")
+            startActivity(intent)
         }
     }
 

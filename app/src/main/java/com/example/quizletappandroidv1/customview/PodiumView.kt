@@ -61,11 +61,11 @@ class PodiumView @JvmOverloads constructor(
         item3: Pair<String, String>
     ) {
         txtFirstName.text = firstUser.rankSystem.userRanking[0].userName
-        txtSecondName.text = secondUser.rankSystem.userRanking[0].userName
-        txtThirdName.text = thirdUser.rankSystem.userRanking[0].userName
+        txtSecondName.text = secondUser.rankSystem.userRanking[1].userName
+        txtThirdName.text = thirdUser.rankSystem.userRanking[2].userName
         txtFirstScore.text = firstUser.rankSystem.userRanking[0].score.toString()
-        txtSecondScore.text = secondUser.rankSystem.userRanking[0].score.toString()
-        txtThirdScore.text = thirdUser.rankSystem.userRanking[0].score.toString()
+        txtSecondScore.text = secondUser.rankSystem.userRanking[1].score.toString()
+        txtThirdScore.text = thirdUser.rankSystem.userRanking[2].score.toString()
 
         txtItem1Value.text = item1.first
         txtItem1Label.text = item1.second

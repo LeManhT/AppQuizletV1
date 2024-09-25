@@ -24,15 +24,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.adapter.CreateSetItemAdapter
 import com.example.quizletappandroidv1.custom.CustomToast
 import com.example.quizletappandroidv1.databinding.FragmentCreateSetBinding
+import com.example.quizletappandroidv1.models.CreateSetRequest
 import com.example.quizletappandroidv1.models.FlashCardModel
 import com.example.quizletappandroidv1.utils.FileHelperUtils
 import com.example.quizletappandroidv1.utils.Helper
+import com.example.quizletappandroidv1.viewmodel.home.HomeViewModel
+import com.example.quizletappandroidv1.viewmodel.studyset.DocumentViewModel
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -46,17 +51,22 @@ import com.google.mlkit.nl.translate.TranslatorOptions
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import dagger.hilt.android.AndroidEntryPoint
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
+import timber.log.Timber
 import java.io.FileInputStream
 import java.util.Locale
 
+@AndroidEntryPoint
 class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
     private lateinit var binding: FragmentCreateSetBinding
     private lateinit var progressDialog: ProgressDialog
+    private val homeViewModel by viewModels<HomeViewModel>()
+    private val documentViewModel by viewModels<DocumentViewModel>()
 
     //    private lateinit var apiService: ApiService
     private var listSet = mutableListOf<FlashCardModel>()
@@ -122,12 +132,36 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
                 ActivityCompat.requestPermissions(
                     requireActivity(), arrayOf(permission), STORAGE_CODE
                 )
+
             }
             }
 // Initialize RecyclerView
         setupRecyclerView()
 // Set up button listeners and other UI elements
         setupUIListeners()
+
+        homeViewModel.rankResult.observe(viewLifecycleOwner) { data ->
+            data.onSuccess {
+                currentPoint = it.currentScore
+            }.onFailure {
+                Timber.d("Error: ${it.message}")
+            }
+        }
+
+        documentViewModel.studySetResponse.observe(viewLifecycleOwner) { data ->
+            if (data) {
+                CustomToast(requireContext()).makeText(
+                    requireContext(),
+                    resources.getString(R.string.create_set_success),
+                    CustomToast.LONG,
+                    CustomToast.SUCCESS
+                ).show()
+                findNavController().navigate(R.id.action_createSet_to_studySet)
+            } else {
+                Timber.d("Error: $data")
+            }
+        }
+
 // Check for camera permission
         if (ContextCompat.checkSelfPermission(
                 requireContext(), android.Manifest.permission.CAMERA
@@ -144,7 +178,8 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
         listSet.add(FlashCardModel())
         listSet.add(FlashCardModel())
         listSet.add(FlashCardModel())
-        adapterCreateSet = CreateSetItemAdapter(listSet)
+        adapterCreateSet = CreateSetItemAdapter()
+        adapterCreateSet.updateListSet(listSet)
         adapterCreateSet.setOnIconClickListener(this)
         binding.RvCreateSets.layoutManager = LinearLayoutManager(requireContext())
         binding.RvCreateSets.adapter = adapterCreateSet
@@ -201,8 +236,7 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
             if (currentPoint > 30) {
                 showImportAlertDialog(requireContext())
             } else {
-                val i = Intent(requireContext(), QuizletPlus::class.java)
-                startActivity(i)
+                findNavController().navigate(R.id.action_createSet_to_add3)
             }
         }
 
@@ -242,6 +276,9 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
             }
         excelPickerLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+
+                Log.d("ImportExcel12222", "registerForActivityResult Import Excel Request Code")
+
                 if (result.resultCode == Activity.RESULT_OK) {
                     val selectedFileUri = result.data?.data
                     if (selectedFileUri != null) {
@@ -271,34 +308,10 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
     private fun createNewStudySet(
         userId: String, studySetName: String, studySetDesc: String, dataSet: List<FlashCardModel>
     ) {
-        //        lifecycleScope.launch {
-        //            showLoading(resources.getString(R.string.creatingStudySet)) //
-        //            try { //                val body = CreateSetRequest( //
-        //            name = studySetName, description = studySetDesc, allNewCards = dataSet //
-        //            ) //                val result = apiService.createNewStudySet(userId, body) //
-        //                if (result.isSuccessful) { //
-        //                result.body()?.let { //
-        //                CustomToast(requireContext()).makeText( //
-        //                requireContext(), //
-        //                resources.getString(R.string.create_study_set_success),
-        //                            CustomToast.LONG, //
-        //                            CustomToast.SUCCESS //                        ).show()
-        // //                        UserM.setUserData(it) //
-        // val i = Intent(requireContext(), AuthActivity::class.java) //
-        // i.putExtra("selectedFragment", "Library") //
-        //
-        // i.putExtra("createMethod", "createSet") //
-        // startActivity(i) //                    } //                } else { //
-        // result.errorBody()?.string()?.let { //
-        // CustomToast(requireContext()).makeText( //
-        // requireContext(), it, CustomToast.LONG, CustomToast.ERROR //
-        // ).show() //                        Log.d("err", it) //                    } //
-        // } //            } catch (e: Exception) { //
-        // CustomToast(requireContext()).makeText( //
-        // requireContext(), e.message.toString(), CustomToast.LONG, CustomToast.ERROR //
-        // ).show() //                Log.d("err2", e.message.toString()) //            } finally { //
-        // progressDialog.dismiss() //            } //        }
-        //
+        val body = CreateSetRequest(
+            name = studySetName, description = studySetDesc, allNewCards = dataSet
+        )
+        documentViewModel.createNewStudySet(userId, body)
     }
 
     private fun showLoading(msg: String) {
@@ -380,6 +393,7 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
         )
         when (requestCode) {
             IMPORT_EXCEL_REQUEST_CODE -> {
+                Log.d("ImportExcel", "Import Excel Request Code")
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     launchFilePicker()
                 } else {
@@ -398,6 +412,7 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
     }
 
     private fun importExcelFile(filePath: String) {
+        Log.d("ImportExcel", "Importing Excel file: $filePath")
         val inputStream = FileInputStream(filePath)
         try {
             val workbook: Workbook = WorkbookFactory.create(inputStream)
@@ -413,7 +428,6 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
 //        }
 //        return
 //    }
-
             val sheet = workbook.getSheetAt(0)
             listSet.clear()
             for (rowIndex in 0 until sheet.physicalNumberOfRows) {
@@ -559,9 +573,6 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
                 dualLanguageTranslator!!.translate(
                     text
                 ).addOnSuccessListener { translatedText ->
-                    Log.i(
-                        "detectL2", "translatedText: $translatedText"
-                    )
                     progressDialog.dismiss()
                     if (adapterCreateSet.getIsDefinitionTranslate() == true) {
                         listSet[position].definition = translatedText
@@ -610,8 +621,6 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
                             )
                             listSet.add(flashCard)
                             adapterCreateSet.notifyDataSetChanged()
-                            Log.d("Term", "Term: $term")
-                            Log.d("Definition", "Definition: $definition")
                         }
                     }
                 }

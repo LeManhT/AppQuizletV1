@@ -3,7 +3,6 @@ package com.example.quizletappandroidv1.adapter
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,17 +14,22 @@ import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.models.TaskData
 import com.example.quizletappandroidv1.ui.fragments.ItemAchievementBottomSheet
 import com.example.quizletappandroidv1.utils.Helper
-import com.google.firebase.messaging.FirebaseMessaging
 import kotlin.math.min
 
 class AchievementAdapter(
-    private val listAchievements: List<TaskData>,
     private val context: Context,
     private val numberAdapter: Int,
+    private val onClickItemAchievement: IAchievementClick
 ) :
     RecyclerView.Adapter<AchievementAdapter.AchievementHolder>() {
     var isExpanded = false
     var isExpandedStreak = false
+
+    private var listAchievements: List<TaskData> = mutableListOf()
+
+    interface IAchievementClick {
+        fun handleClickAchievement(itemAchievement: TaskData)
+    }
 
     inner class AchievementHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView)
@@ -44,7 +48,7 @@ class AchievementAdapter(
 
         val imageName = "ac${listAchievements[position].id}"
         val imageResourceId =
-            context.resources.getIdentifier(imageName, "drawable", context.packageName)
+            context.resources.getIdentifier(imageName, "raw", context.packageName)
         // Check if drawable is set
         if (listAchievements[position].status != 2) {
             val originalBitmap: Bitmap? =
@@ -57,23 +61,22 @@ class AchievementAdapter(
         } else {
             imgAchievement.setImageResource(imageResourceId)
             // Retrieve the FCM token
-            FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val token = task.result
-                    Log.d("FCMToken", "Current token: $token")
-                    // Use the token as needed
-                } else {
-                    Log.e("FCMToken", "Failed to get token")
-                }
-            }
+//            FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+//                if (task.isSuccessful) {
+//                    val token = task.result
+//                    Log.d("FCMToken", "Current token: $token")
+//                    // Use the token as needed
+//                } else {
+//                    Log.e("FCMToken", "Failed to get token")
+//                }
+//            }
         }
         txtAchievementName.text = listAchievements[position].taskName
         txtAchievementStatus.text = listAchievements[position].description
 
         holder.itemView.apply {
             setOnClickListener {
-//                onClickItemAchievement.handleClickAchievement(position)
-                showAchievementDialog(listAchievements[position])
+                onClickItemAchievement.handleClickAchievement(listAchievements[position])
             }
         }
 
@@ -88,13 +91,13 @@ class AchievementAdapter(
         return 0
     }
 
-    private fun showAchievementDialog(taskData: TaskData) {
-        val addBottomSheet = ItemAchievementBottomSheet.newInstance(taskData)
-        addBottomSheet.show(
-            (context as AppCompatActivity).supportFragmentManager,
-            ItemAchievementBottomSheet.TAG
-        )
-    }
+//    private fun showAchievementDialog(taskData: TaskData) {
+//        val addBottomSheet = ItemAchievementBottomSheet.newInstance(taskData)
+//        addBottomSheet.show(
+//            (context as AppCompatActivity).supportFragmentManager,
+//            ItemAchievementBottomSheet.TAG
+//        )
+//    }
 
     fun setIsExpaned() {
         isExpanded = !isExpanded
@@ -105,4 +108,10 @@ class AchievementAdapter(
         isExpandedStreak = !isExpandedStreak
         notifyDataSetChanged()
     }
+
+    fun updateData(newList: List<TaskData>) {
+        this.listAchievements = newList
+        notifyDataSetChanged()
+    }
+
 }

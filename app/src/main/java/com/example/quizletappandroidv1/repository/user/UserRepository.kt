@@ -56,7 +56,6 @@ class UserRepository @Inject constructor(private val apiService: ApiService) {
             val result = apiService.loginUser(body)
             if (result.isSuccessful) {
                 val userResponse = result.body()!!
-                Log.d("userResponse", Gson().toJson(userResponse))
                 Result.success(userResponse)
             } else {
                 val errorMessage = result.errorBody()?.string() ?: "Unknown error"
@@ -114,7 +113,27 @@ class UserRepository @Inject constructor(private val apiService: ApiService) {
         }
     }
 
+    suspend fun getUserData(userId: String): Result<UserResponse> {
+        return try {
+            Timber.tag("API_REQUEST").d("UserID: $userId")
+            val result = apiService.getUserData(userId)
 
+            if (result.isSuccessful) {
+                Log.d("APIPPPP",Gson().toJson(result.body()!!))
+                Result.success(result.body()!!)
+            } else {
+                val errorBody = result.errorBody()?.string() ?: "No error body"
+                Timber.tag("API_ERROR").e("Error: $errorBody, Code: ${result.code()}")
+                Log.d("APIPPPP1",Gson().toJson(result.body()!!) + "errroe")
+                Result.failure(Exception(errorBody))
+            }
+        } catch (e: Exception) {
+            Timber.tag("API_EXCEPTION").e("Exception: ${e.message}")
+            Log.d("APIPPPP2",Gson().toJson(e.message) + "errroe")
+            Result.failure(e)
+        }
+    }
 
 }
+
 

@@ -430,4 +430,21 @@
     <string name="top2">Top 2</string>
     <string name="top1">Top 1</string>
     <string name="top3">Top 3</string>
+    <string name="change_theme">Change theme</string>
+    <string name="delete_folder_loading">Delete folder in proccess...</string>
+    <string name="delete_folder_success">Delete folder successfully</string>
+    <string name="edit_folder_loading">Updating folder...</string>
+    <string name="operation_successful">Execute successfully</string>
+    <string name="error_occurred">Error occurred</string>
+    <string name="manage_users">Manage Users</string>
+    <string name="app_logo">App Logo</string>
+    <string name="vn">VN</string>
+    <string name="manage_study_sets">Manage Study Sets</string>
+    <string name="manage_user">Manage User</string>
+    <string name="manage_study_set">Manage Study Set</string>
+    <string name="setting">Settings</string>
+    <string name="me">Me</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="create_set_success">Create study set successfully !</string>
+    <string name="sound">Sound</string>
 </resources>

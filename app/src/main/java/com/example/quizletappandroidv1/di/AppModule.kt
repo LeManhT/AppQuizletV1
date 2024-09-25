@@ -4,6 +4,8 @@ import android.content.Context
 import com.example.quizletappandroidv1.dao.QuoteDao
 import com.example.quizletappandroidv1.database.api.retrofit.ApiService
 import com.example.quizletappandroidv1.database.local.MyAppDatabase
+import com.example.quizletappandroidv1.repository.home.HomeRepository
+import com.example.quizletappandroidv1.repository.studyset.DocumentRepository
 import com.example.quizletappandroidv1.repository.user.UserRepository
 import dagger.Module
 import dagger.Provides
@@ -27,10 +29,6 @@ object AppModule {
         return database.quoteDao()
     }
 
-    @Provides
-    @Singleton
-    fun provideUserRepository(apiService: ApiService): UserRepository {
-        return UserRepository(apiService)
-    }
+
 
 }

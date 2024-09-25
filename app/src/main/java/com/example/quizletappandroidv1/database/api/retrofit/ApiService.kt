@@ -1,17 +1,23 @@
 package com.example.quizletappandroidv1.database.api.retrofit
 
+import com.example.appquizlet.model.SearchSetModel
+import com.example.appquizlet.model.ShareResponse
 import com.example.quizletappandroidv1.entity.UserResponse
 import com.example.quizletappandroidv1.models.CreateSetRequest
 import com.example.quizletappandroidv1.models.DetectContinueModel
 import com.example.quizletappandroidv1.models.NoticeModel
 import com.example.quizletappandroidv1.models.RankResultModel
+import com.example.quizletappandroidv1.models.ShareFolderModel
+import com.example.quizletappandroidv1.models.StudySetModel
 import com.google.gson.JsonObject
+import com.squareup.okhttp.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -84,7 +90,7 @@ interface ApiService {
     @GET("/StudySetPublic/GetOne")
     suspend fun getOneStudySet(
         @Query("setId") setId: String
-    )
+    ): Response<StudySetModel>
 
     @POST("User/DetectContinueStudy")
     suspend fun detectContinueStudy(
@@ -92,23 +98,20 @@ interface ApiService {
         @Query("timeDetect") timeDetect: Long
     ): Response<DetectContinueModel>
 
-//    @GET("StudySet/ShareView")
-//    suspend fun getSetShareView(
-//        @Query("userId") userId: String,
-//        @Query("setId") setId: String
-//    ): Response<ShareResponse>
+    @GET("StudySet/ShareView")
+    suspend fun getSetShareView(
+        @Query("userId") userId: String, @Query("setId") setId: String
+    ): Response<ShareResponse>
 
-//    @GET("Folder/ShareView")
-//    suspend fun getFolderShareView(
-//        @Query("userId") userId: String,
-//        @Query("folderId") folderId: String
-//    ): Response<ShareFolderModel>
-//
-//    @PUT("User/UpdateInfo")
-//    suspend fun updateUserInfo(
-//        @Query("userId") userId: String,
-//        @Body body: RequestBody
-//    ): Response<UpdateUserResponse>
+    @GET("Folder/ShareView")
+    suspend fun getFolderShareView(
+        @Query("userId") userId: String, @Query("folderId") folderId: String
+    ): Response<ShareFolderModel>
+
+    @PUT("User/UpdateInfo")
+    suspend fun updateUserInfo(
+        @Query("userId") userId: String, @Body body: RequestBody
+    ): Response<UserResponse>
 
     @POST("StudySet/EnablePublic")
     suspend fun enablePublicSet(
@@ -122,14 +125,14 @@ interface ApiService {
         @Query("setId") setId: String
     )
 
-//    @GET("StudySetPublic/Find")
-//    suspend fun findStudySet(
-//        @Query("keyword") keyword: String
-//    ): Response<List<SearchSetModel>>
-//
-//    @GET("StudySetPublic/GetAll")
-//    suspend fun getAllSet(
-//    ): Response<List<SearchSetModel>>
+    @GET("StudySetPublic/Find")
+    suspend fun findStudySet(
+        @Query("keyword") keyword: String
+    ): Response<List<SearchSetModel>>
+
+    @GET("StudySetPublic/GetAll")
+    suspend fun getAllSet(
+    ): Response<List<SearchSetModel>>
 
     @POST("StudySet/AddToManyFolders")
     suspend fun addSetToManyFolder(
@@ -160,4 +163,11 @@ interface ApiService {
     suspend fun getAllCurrentNotices(
         @Query("userId") userId: String
     ): Response<List<NoticeModel>>
+
+    @POST("User/GetInfoByID")
+    suspend fun getUserData(
+        @Query("ID") userId: String
+    ): Response<UserResponse>
+
+
 }

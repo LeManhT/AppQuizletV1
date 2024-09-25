@@ -63,6 +63,9 @@
     <color name="txt_black_flashcard">#FF000000</color>
 
 
+    <color name="colorActive">#424242</color>
+    <color name="colorPressed">#E0E0E0</color>
+    <color name="colorNormal">#FFFFFF</color>
 
 </resources>
 

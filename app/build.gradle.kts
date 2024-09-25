@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
 //    id("com.google.gms.google-services")
     id("kotlin-kapt")
+    id ("kotlin-parcelize")
     id("androidx.navigation.safeargs")
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp") version "1.9.23-1.0.20"
@@ -46,6 +47,11 @@ android {
         viewBinding = true
         dataBinding = true
     }
+
+    aaptOptions {
+        noCompress("tflite")
+    }
+
 }
 
 dependencies {
@@ -69,8 +75,9 @@ dependencies {
 
     implementation("com.github.rizmaulana:floating-slideup-sheet:0.1.0")
     implementation("com.google.firebase:firebase-messaging:23.4.0")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.6")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.6")
+    // Kotlin Navigation
+    implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
+    implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
 //    implementation("androidx.navigation:navigation-fragment-ktx:2.7.5")
 //    implementation("androidx.navigation:navigation-ui-ktx:2.7.5")
 
@@ -99,6 +106,12 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
 
     implementation("com.github.dhaval2404:imagepicker:2.1")
+
+//    implementation("com.google.mlkit:object-detection:17.0.2")
+
+    implementation("org.tensorflow:tensorflow-lite:2.9.0")
+    implementation("org.tensorflow:tensorflow-lite-task-vision:0.3.1")
+
 
     // To recognize Latin script
     implementation("com.google.mlkit:text-recognition:16.0.0")

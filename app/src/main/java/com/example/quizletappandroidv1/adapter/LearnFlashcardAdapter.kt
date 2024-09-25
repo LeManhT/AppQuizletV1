@@ -1,6 +1,5 @@
 package com.example.quizletappandroidv1.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -10,13 +9,12 @@ import com.example.quizletappandroidv1.models.FlashCardModel
 import com.example.quizletappandroidv1.utils.Helper
 
 class LearnFlashcardAdapter(
-    private val context: Context,
-    private val listFlashcards: List<FlashCardModel>,
     private val onClickLearnCard: LearnCardClick,
     private var itemClickListener: onLearnCardClick? = null,
 ) :
     RecyclerView.Adapter<LearnFlashcardAdapter.LearnFlashcardHolder>() {
     private val flippedPositions = HashSet<Int>()
+    private var listFlashcards: List<FlashCardModel> = mutableListOf()
 
     interface onLearnCardClick {
         fun handleClickAudio(term: String)
@@ -97,5 +95,11 @@ class LearnFlashcardAdapter(
 
     fun setOnLearnCardClick(listener: onLearnCardClick) {
         this.itemClickListener = listener
+    }
+
+    fun updateData(newList: List<FlashCardModel>) {
+        this.listFlashcards = newList
+        notifyDataSetChanged()
+
     }
 }

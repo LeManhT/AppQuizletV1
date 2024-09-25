@@ -1,7 +1,6 @@
 package com.example.quizletappandroidv1.ui.fragments
 
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
@@ -12,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -26,6 +26,7 @@ import com.example.quizletappandroidv1.adapter.AdapterCustomDatePicker
 import com.example.quizletappandroidv1.adapter.DayOfWeekAdapter
 import com.example.quizletappandroidv1.adapter.RVFolderItemAdapter
 import com.example.quizletappandroidv1.adapter.RvStudySetItemAdapter
+import com.example.quizletappandroidv1.custom.CustomDialog
 import com.example.quizletappandroidv1.custom.CustomToast
 import com.example.quizletappandroidv1.custom.EqualSpacingItemDecoration
 import com.example.quizletappandroidv1.customview.PodiumView
@@ -33,15 +34,13 @@ import com.example.quizletappandroidv1.databinding.FragmentHomeBinding
 import com.example.quizletappandroidv1.listener.ItemTouchHelperAdapter
 import com.example.quizletappandroidv1.listener.RVFolderItem
 import com.example.quizletappandroidv1.models.FolderModel
-import com.example.quizletappandroidv1.models.RankItemModel
-import com.example.quizletappandroidv1.models.RankResultModel
-import com.example.quizletappandroidv1.models.RankSystem
 import com.example.quizletappandroidv1.models.StudySetModel
 import com.example.quizletappandroidv1.viewmodel.home.HomeViewModel
-import com.example.quizletappandroidv1.viewmodel.studyset.StudySetViewModel
+import com.example.quizletappandroidv1.viewmodel.studyset.DocumentViewModel
 import com.example.quizletappandroidv1.viewmodel.user.UserViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -58,7 +57,7 @@ class FragmentHome : Fragment() {
     private lateinit var sharedPreferencesTheme: SharedPreferences
     private var apiCallsInProgress = false
 
-    private val studySetViewModel: StudySetViewModel by viewModels()
+    private val documentViewModel: DocumentViewModel by viewModels()
     private val homeViewModel: HomeViewModel by viewModels()
     private val userViewModel: UserViewModel by viewModels()
 
@@ -88,11 +87,37 @@ class FragmentHome : Fragment() {
             }
         }
 
+        MyApplication.userId?.let { userViewModel.getUserData(it) }
+
+        binding.textView9.setOnClickListener {
+            val successIcon = ContextCompat.getDrawable(requireContext(), R.drawable.vietnam_flag)
+            val customDialog = CustomDialog(requireContext())
+
+            // Hiển thị Success Dialog
+            customDialog.showDialog(
+                icon = successIcon!!,
+                title = "SUCCESS!",
+                message = "Thank you for your request. We are working hard to find the best service and deals for you.",
+                buttonText = "Continue"
+            ) {
+                // Handle button click action (e.g., navigate, close, etc.)
+            }
+        }
+
         streakTextView = binding.txtCountStreak
 
         homeViewModel.rankResult.observe(viewLifecycleOwner) { result ->
-
             result.onSuccess { it ->
+                Log.d("Successs", Gson().toJson(it))
+
+                val podiumView: PodiumView = view.findViewById(R.id.podiumView)
+                podiumView.setPodiumData(
+                    it, it, it,
+                    item1 = "2" to "Avenger",
+                    item2 = "1" to "Super hero",
+                    item3 = "3" to "Hero"
+                )
+
                 if (it.currentScore > 7000) {
                     binding.btnUpgradeFeature.visibility = View.GONE
                     binding.txtVerified.visibility = View.VISIBLE
@@ -132,8 +157,7 @@ class FragmentHome : Fragment() {
             findNavController().navigate(R.id.action_fragmentHome3_to_rankLeaderBoard)
         }
         binding.txtViewDetailLeaderBoard.setOnClickListener {
-            val i = Intent(context, RankLeaderBoard::class.java)
-            startActivity(i)
+            findNavController().navigate(R.id.action_fragmentHome3_to_rankLeaderBoard)
         }
 
         binding.txtViewAllQuote.setOnClickListener {
@@ -164,22 +188,21 @@ class FragmentHome : Fragment() {
         adapterHomeFolder =
             RVFolderItemAdapter(requireContext(), object : RVFolderItem {
                 override fun handleClickFolderItem(folderItem: FolderModel, position: Int) {
-//                    val i = Intent(context, FolderClickActivity::class.java)
-//                    i.putExtra("idFolder", listFolderItems[position].id)
-//                    startActivity(i)
-                    findNavController().navigate(R.id.action_fragmentHome3_to_folderDetail)
+                    val action =
+                        FragmentHomeDirections.actionFragmentHome3ToFolderDetail(folderItem.id)
+                    findNavController().navigate(action)
                 }
             })
 
         adapterHomeStudySet =
             RvStudySetItemAdapter(requireContext(), object : RVStudySetItem {
                 override fun handleClickStudySetItem(setItem: StudySetModel, position: Int) {
-                    val intent = Intent(requireContext(), StudySetDetail::class.java)
-                    startActivity(intent)
+                    val action =
+                        FragmentHomeDirections.actionFragmentHome3ToStudySetDetail(setItem.id)
+                    findNavController().navigate(action)
                 }
             }, false)
 
-        // Access the RecyclerView through the binding
         rvHomeFolder.adapter = adapterHomeFolder
         rvStudySet.adapter = adapterHomeStudySet
 
@@ -190,35 +213,27 @@ class FragmentHome : Fragment() {
         snapHelperFolder.attachToRecyclerView(binding.rvHomeFolders)
         snapHelper.attachToRecyclerView(binding.rvHomeStudySet)
 
-        userViewModel.loginResult.observe(viewLifecycleOwner) { result ->
+        userViewModel.userData.observe(viewLifecycleOwner) { result ->
+
             result.onSuccess { userResponse ->
-
-                Log.d("fd1", "Vap 6")
-
-
                 if (userResponse.documents.folders.isEmpty()) {
                     binding.rvHomeFolders.visibility = View.GONE
                     binding.noDataHomeFolder.visibility = View.VISIBLE
-                    Log.d("fd1", "Vap 0")
                 } else {
                     binding.rvHomeFolders.visibility = View.VISIBLE
                     binding.noDataHomeFolder.visibility = View.GONE
-                    Log.d("fd1", "Vap 1")
                     adapterHomeFolder.updateData(userResponse.documents.folders)
                 }
 
                 if (userResponse.documents.studySets.isEmpty()) {
                     binding.rvHomeStudySet.visibility = View.GONE
                     binding.noDataHomeSet.visibility = View.VISIBLE
-                    Log.d("fd1", "Vap 3")
                 } else {
                     binding.rvHomeStudySet.visibility = View.VISIBLE
                     binding.noDataHomeSet.visibility = View.GONE
                     adapterHomeStudySet.updateData(userResponse.documents.studySets)
-                    Log.d("fd1", "Vap 4")
                 }
             }.onFailure { exception ->
-                Log.d("fd1", "Vap 5")
                 CustomToast(requireContext()).makeText(
                     requireContext(),
                     exception.message.toString(),
@@ -277,7 +292,6 @@ class FragmentHome : Fragment() {
                 recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder
             ) {
                 super.clearView(recyclerView, viewHolder)
-                // Đặt lại thuộc tính khi kéo kết thúc
                 viewHolder.itemView.animate().translationY(0f).alpha(1f).setDuration(300).start()
             }
 
@@ -287,8 +301,6 @@ class FragmentHome : Fragment() {
 
 //        rvHomeFolder.isScrollbarFadingEnabled = false
 
-
-//        Custom date/
         val recyclerViewDayOfWeek: RecyclerView = binding.rvDayOfWeek
         val daysOfWeek = listOf("S", "M", "T", "W", "T", "F", "S")
         val dayOfWeekAdapter = DayOfWeekAdapter(daysOfWeek)
@@ -298,7 +310,6 @@ class FragmentHome : Fragment() {
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         recyclerViewDayOfWeek.adapter = dayOfWeekAdapter
 
-        // Dùng RecyclerView cho Ngày trong Tháng
         val recyclerViewDay: RecyclerView = binding.rvCustomDatePicker
 
         // Lấy ngày hiện tại
@@ -362,59 +373,6 @@ class FragmentHome : Fragment() {
             }
         }
 
-        val podiumView: PodiumView = view.findViewById(R.id.podiumView)
-        podiumView.setPodiumData(
-            RankResultModel(
-                100, 1,
-                RankSystem(
-                    listOf(
-                        RankItemModel(
-                            21,
-                            1,
-                            "lemanh",
-                            "lemanh@gmail.com",
-                            "05/09/2002",
-                            1
-                        )
-                    )
-                )
-            ),
-            RankResultModel(
-                100, 2,
-                RankSystem(
-                    listOf(
-                        RankItemModel(
-                            21,
-                            1,
-                            "lemanh",
-                            "lemanh@gmail.com",
-                            "05/09/2002",
-                            1
-                        )
-                    )
-                )
-            ),
-            RankResultModel(
-                100, 3,
-                RankSystem(
-                    listOf(
-                        RankItemModel(
-                            21,
-                            1,
-                            "lemanh",
-                            "lemanh@gmail.com",
-                            "05/09/2002",
-                            1
-                        )
-                    )
-                )
-            ),
-            item1 = "100" to "Avengers",
-            item2 = "200" to "Teams",
-            item3 = "4000" to "Walkers"
-        )
-
-
 
     }
 
@@ -435,7 +393,5 @@ class FragmentHome : Fragment() {
         editor.putInt("countStreak", streak)
         editor.apply()
     }
-
-
 
 }

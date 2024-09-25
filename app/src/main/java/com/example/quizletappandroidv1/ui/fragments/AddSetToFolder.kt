@@ -1,60 +1,83 @@
 package com.example.quizletappandroidv1.ui.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.quizletappandroidv1.R
+import com.example.quizletappandroidv1.adapter.ViewPagerTabAddSet
+import com.example.quizletappandroidv1.databinding.FragmentAddSetToFolderBinding
+import com.google.android.material.tabs.TabLayoutMediator
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [AddSetToFolder.newInstance] factory method to
- * create an instance of this fragment.
- */
 class AddSetToFolder : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var binding: FragmentAddSetToFolderBinding
+    private val args : AddSetToFolderArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_add_set_to_folder, container, false)
+        binding = FragmentAddSetToFolderBinding.inflate(layoutInflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment AddSetToFolder.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            AddSetToFolder().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val toolbar = binding.toolbar
+        (activity as? AppCompatActivity)?.setSupportActionBar(toolbar)
+        (activity as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        val adapterTabSet = ViewPagerTabAddSet(childFragmentManager, lifecycle)
+        binding.pagerAddSetLib.adapter = adapterTabSet
+//        adapterTabSet.setFolderId(folderId)
+        TabLayoutMediator(binding.tabLibAddSet, binding.pagerAddSetLib) { tab, pos ->
+            when (pos) {
+                0 -> {
+                    tab.text = resources.getString(R.string.created)
+                    tab.icon = ResourcesCompat.getDrawable(resources, R.drawable.note, null)
+                }
+//                1 -> tab.text = resources.getString(R.string.studied)
+                1 -> {
+                    tab.text = resources.getString(R.string.folders)
+                    tab.icon =
+                        ResourcesCompat.getDrawable(resources, R.drawable.folder_outlined, null)
                 }
             }
+        }.attach()
+
+        binding.iconAddToSet.setOnClickListener {
+//            // Lấy fragment hiện tại của ViewPager
+//            val currentFragment =
+//                supportFragmentManager.fragments[binding.pagerAddSetLib.currentItem]
+//
+//            if (currentFragment is FragmentCreatedSet) {
+//                // Gọi phương thức trong fragment
+//                currentFragment.insertSetToFolder(folderId)
+//            }
+//
+//            if (currentFragment is FragmentFolderSet) {
+//                currentFragment.insertFolderToFolder(folderId)
+//            }
+        }
     }
+
+
+    @Deprecated("Deprecated in Java")
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                findNavController().popBackStack()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
 }

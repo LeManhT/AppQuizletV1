@@ -7,12 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.quizletappandroidv1.MyApplication
 import com.example.quizletappandroidv1.adapter.AchievementAdapter
 import com.example.quizletappandroidv1.databinding.FragmentAchievementsBinding
+import com.example.quizletappandroidv1.models.TaskData
 import com.example.quizletappandroidv1.viewmodel.home.HomeViewModel
-import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
 import java.time.YearMonth
@@ -49,6 +50,29 @@ class Achievements : Fragment() {
             requireActivity().finish()
         }
 
+        adapterAchievementStreak =
+            AchievementAdapter(requireContext(), 2, object : AchievementAdapter.IAchievementClick {
+                override fun handleClickAchievement(itemAchievement: TaskData) {
+                    val action =
+                        AchievementsDirections.actionAchievementsToItemAchievementBottomSheet(
+                            itemAchievement
+                        )
+                    findNavController().navigate(action)
+                }
+            })
+
+        adapterAchievementStudySet =
+            AchievementAdapter(requireContext(), 2, object : AchievementAdapter.IAchievementClick {
+                override fun handleClickAchievement(itemAchievement: TaskData) {
+                    val action =
+                        AchievementsDirections.actionAchievementsToItemAchievementBottomSheet(
+                            itemAchievement
+                        )
+                    findNavController().navigate(action)
+                }
+            })
+
+
         homeViewModel.dataAchievement.observe(viewLifecycleOwner) { result ->
 
             result.onSuccess {
@@ -56,20 +80,17 @@ class Achievements : Fragment() {
                     "Current streak : ${it.streak.currentStreak}-days streak"
                 val listStreak = it.achievement.taskList.filter { it.type == "Streak" }
                 val listStudy = it.achievement.taskList.filter { it.type == "Study" }
-                Log.d("streak", Gson().toJson(listStreak))
                 binding.rvAchievementStreak.layoutManager =
                     GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
                 binding.rvAchievementStudy.adapter = adapterAchievementStudySet
-
-
-                adapterAchievementStreak = AchievementAdapter(listStudy, requireContext(), 2)
+                adapterAchievementStreak.updateData(listStreak)
                 binding.rvAchievementStudy.layoutManager =
                     GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
                 binding.rvAchievementStreak.adapter = adapterAchievementStreak
+                adapterAchievementStudySet.updateData(listStudy)
             }.onFailure {
-
+                Log.d("ErrorAchievements", it.message.toString())
             }
-
         }
 
         binding.btnViewMoreLessStudy.setOnClickListener {

@@ -77,7 +77,7 @@ class RvStudySetItemAdapter(
         studySetChip.text = countTermText
         txtStudySetUsername.text = Helper.getDataUsername(context)
 //            imgStudySetAvatar.setImageResource(currentItem.avatar)
-//            txtStudySetUsername.text = currentItem.username
+            txtStudySetUsername.text = currentItem.nameOwner
 
         if (currentItem.folderOwnerId.isNotEmpty() && isCheckBackground == true) {
             cardViewStudySet.background =

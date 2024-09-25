@@ -7,7 +7,6 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.example.quizletappandroidv1.databinding.ActivityMainBinding
-import com.example.quizletappandroidv1.ui.fragments.Add
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -32,8 +31,11 @@ class MainActivity : AppCompatActivity() {
             when (menuItem.itemId) {
                 R.id.add3 -> {
                     // Show the Add BottomSheetDialogFragment
-                    val addFragment = Add()
-                    addFragment.show(supportFragmentManager, addFragment.tag)
+//                    val addFragment = Add()
+//                    addFragment.show(supportFragmentManager, addFragment.tag)
+                    if (navController.currentDestination?.id != R.id.createSet) {
+                        navController.navigate(R.id.add3)
+                    }
                     true
                 }
 

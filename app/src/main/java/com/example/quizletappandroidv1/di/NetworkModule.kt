@@ -1,7 +1,9 @@
     package com.example.quizletappandroidv1.di
 
     import com.example.quizletappandroidv1.database.api.retrofit.ApiService
-    import com.example.quizletappandroidv1.database.api.retrofit.AuthInterceptor
+    import com.example.quizletappandroidv1.repository.home.HomeRepository
+    import com.example.quizletappandroidv1.repository.studyset.DocumentRepository
+    import com.example.quizletappandroidv1.repository.user.UserRepository
     import com.example.quizletappandroidv1.utils.Constants
     import dagger.Module
     import dagger.Provides
@@ -24,9 +26,7 @@
         fun provideRetrofit(): Retrofit {
             return Retrofit.Builder().baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(
-                    OkHttpClient.Builder().addInterceptor(AuthInterceptor(credentials)).build()
-                )
+                .client(OkHttpClient.Builder().build())
                 .build()
         }
 
@@ -34,4 +34,21 @@
         fun provideApiService(retrofit: Retrofit): ApiService {
             return retrofit.create(ApiService::class.java)
         }
+
+        @Provides
+        fun provideUserRepository(apiService: ApiService): UserRepository {
+            return UserRepository(apiService)
+        }
+
+
+        @Provides
+        fun provideHomeRepository(apiService: ApiService): HomeRepository {
+            return HomeRepository(apiService)
+        }
+
+        @Provides
+        fun provideDocumentRepository(apiService: ApiService): DocumentRepository {
+            return DocumentRepository(apiService)
+        }
+
     }

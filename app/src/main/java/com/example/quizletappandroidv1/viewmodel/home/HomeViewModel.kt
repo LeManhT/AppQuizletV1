@@ -36,7 +36,6 @@ class HomeViewModel @Inject constructor(val homeRepository: HomeRepository) : Vi
 
     init {
         if (userId != null) {
-            Log.d("userId", userId)
             getUserRanking(userId)
         }
     }
@@ -67,6 +66,7 @@ class HomeViewModel @Inject constructor(val homeRepository: HomeRepository) : Vi
                 val result = homeRepository.getDataAchievement(userId, timeDetect)
                 _dataAchievement.postValue(result)
             } catch (e: Exception) {
+                Log.d("Achievements", e.message.toString())
                 Timber.tag("Error get rank").d(e.message.toString())
             }
         }

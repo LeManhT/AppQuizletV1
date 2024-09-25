@@ -1,5 +1,4 @@
 package com.example.quizletappandroidv1.entity
-
 import com.example.quizletappandroidv1.models.AchievementData
 import com.example.quizletappandroidv1.models.DocumentModel
 import com.example.quizletappandroidv1.models.StreakData

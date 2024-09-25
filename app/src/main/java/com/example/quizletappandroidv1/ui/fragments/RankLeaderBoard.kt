@@ -5,19 +5,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.example.quizletappandroidv1.R
+import com.example.quizletappandroidv1.adapter.RankItemAdapter
+import com.example.quizletappandroidv1.custom.CustomToast
 import com.example.quizletappandroidv1.customview.RankView
-import com.example.quizletappandroidv1.models.RankItemModel
-import com.example.quizletappandroidv1.models.RankResultModel
-import com.example.quizletappandroidv1.models.RankSystem
+import com.example.quizletappandroidv1.databinding.FragmentRankLeaderBoardBinding
+import com.example.quizletappandroidv1.viewmodel.home.HomeViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class RankLeaderBoard : Fragment() {
+    private lateinit var binding: FragmentRankLeaderBoardBinding
+    private val homeViewModel: HomeViewModel by viewModels()
+    private lateinit var adapterItemRank: RankItemAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_rank_leader_board, container, false)
+    ): View {
+        binding = FragmentRankLeaderBoardBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -34,14 +42,31 @@ class RankLeaderBoard : Fragment() {
             R.raw.t3_removebg_preview
         )
 
-        // Set other ranks
-        val otherRanks = listOf(
-           RankResultModel(100, 1,RankSystem(listOf(RankItemModel(21,1,"lemanh","lemanh@gmail.com","05/09/2002",1)))),
-           RankResultModel(100, 2,RankSystem(listOf(RankItemModel(21,1,"lemanh","lemanh@gmail.com","05/09/2002",1)))),
-           RankResultModel(100, 3,RankSystem(listOf(RankItemModel(21,1,"lemanh","lemanh@gmail.com","05/09/2002",1)))),
-        )
-        rankView.setOtherRanks(otherRanks)
+        adapterItemRank = RankItemAdapter(requireContext())
+
+        homeViewModel.rankResult.observe(viewLifecycleOwner) { userResponse ->
+            userResponse.onSuccess {
+                // Set other ranks
+                val otherRanks = listOf(
+                    it,
+                    it,
+                    it,
+                )
+                rankView.setOtherRanks(otherRanks)
+                adapterItemRank.updateData(it.rankSystem.userRanking)
+                (it.currentRank + 1).toString().also { binding.txtMyOrder.text = it }
+                binding.txtMyPoint.text = it.currentScore.toString()
+                binding.txtMyPointGain.text = it.currentScore.toString()
+                binding.txtTop1Name.text = it.rankSystem.userRanking[0].userName
+                binding.txtTop1Point.text = it.rankSystem.userRanking[0].score.toString()
+            }.onFailure {
+                CustomToast(requireContext()).makeText(
+                    requireContext(),
+                    it.message.toString(),
+                    CustomToast.LONG,
+                    CustomToast.ERROR
+                ).show()
+            }
+        }
     }
-
-
 }

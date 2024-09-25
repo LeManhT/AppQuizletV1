@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/admin_nav_graph"
+    app:startDestination="@id/manageUser">
+
+    <fragment
+        android:id="@+id/profileAdmin"
+        android:name="com.example.quizletappandroidv1.ui.admin.ProfileAdmin"
+        android:label="ProfileAdmin" />
+    <fragment
+        android:id="@+id/manageStudySet"
+        android:name="com.example.quizletappandroidv1.ui.admin.FragmentManageStudySet"
+        android:label="ManageStudySet" />
+    <fragment
+        android:id="@+id/manageUser"
+        android:name="com.example.quizletappandroidv1.ui.admin.FragmentManageUser"
+        android:label="ManageUser" />
+</navigation>

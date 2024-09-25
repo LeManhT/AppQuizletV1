@@ -11,11 +11,12 @@ import com.example.quizletappandroidv1.models.FlashCardModel
 
 
 class CreateSetItemAdapter(
-    private val listSet: MutableList<FlashCardModel>
 ) : RecyclerView.Adapter<CreateSetItemAdapter.CreateSetItemHolder>() {
 
     private var isDefinition: Boolean? = false
     private var isDefinitionTranslate: Boolean? = false
+
+    private var listSet: List<FlashCardModel> = mutableListOf()
 
     interface OnIconClickListener {
         fun onIconClick(position: Int)
@@ -180,7 +181,7 @@ class CreateSetItemAdapter(
         return listSet.size
     }
 
-    fun getListSet(): MutableList<FlashCardModel> {
+    fun getListSet(): List<FlashCardModel> {
         return listSet
     }
 
@@ -191,6 +192,11 @@ class CreateSetItemAdapter(
 
     fun getIsDefinitionTranslate(): Boolean? {
         return isDefinitionTranslate
+    }
+
+    fun updateListSet(newList: List<FlashCardModel>) {
+        this.listSet = newList
+        notifyDataSetChanged()
     }
 
 }
