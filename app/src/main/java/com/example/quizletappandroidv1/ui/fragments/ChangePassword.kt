@@ -11,17 +11,23 @@ import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.example.quizletappandroidv1.MyApplication
 import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.custom.CustomToast
 import com.example.quizletappandroidv1.databinding.FragmentChangePasswordBinding
 import com.example.quizletappandroidv1.ui.activity.AuthActivity
 import com.example.quizletappandroidv1.utils.SharedPreferencesManager
+import com.example.quizletappandroidv1.viewmodel.user.UserViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.regex.Pattern
 
+@AndroidEntryPoint
 class ChangePassword : Fragment(), OnFocusChangeListener {
     private lateinit var binding: FragmentChangePasswordBinding
     private lateinit var progressDialog: ProgressDialog
+    private val userViewModel: UserViewModel by viewModels()
     private val PASSWORD_PATTERN: Pattern =
         Pattern.compile(
             "^" + "(?=.*[@#$%^&+=])" +  // at least 1 special character
@@ -29,6 +35,7 @@ class ChangePassword : Fragment(), OnFocusChangeListener {
                     ".{6,}" +  // at least 6 characters
                     "$"
         )
+    private var curPass: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,10 +63,40 @@ class ChangePassword : Fragment(), OnFocusChangeListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val curPass =
-            requireActivity().intent.getStringExtra("currentPass")
+
+        MyApplication.userId?.let { userViewModel.getUserData(it) }
+
+        userViewModel.userData.observe(viewLifecycleOwner) { status ->
+            status.onSuccess {
+                curPass = it.loginPassword
+            }.onFailure { }
+        }
+
+        userViewModel.changePassResult.observe(viewLifecycleOwner) {
+            if (it) {
+                CustomToast(requireContext()).makeText(
+                    requireContext(),
+                    resources.getString(R.string.change_pass_successful),
+                    CustomToast.LONG,
+                    CustomToast.SUCCESS
+                ).show()
+//                findNavController().popBackStack()
+                logOut()
+            } else {
+                CustomToast(requireContext()).makeText(
+                    requireContext(),
+                    resources.getString(R.string.change_pass_failed),
+                    CustomToast.LONG,
+                    CustomToast.ERROR
+                ).show()
+            }
+        }
+
         binding.txtSave.setOnClickListener {
+//            showLoading(resources.getString(R.string.please_wait))
             val currentPass = binding.edtCurrentPassword.text.toString()
+            Log.d("currentPass", currentPass.toString())
+            Log.d("cuuR", curPass)
             val newPass = binding.edtNewPassword.text.toString()
             val confirmPass =
                 binding.edtConfirmYourPassword.text.toString()
@@ -94,6 +131,13 @@ class ChangePassword : Fragment(), OnFocusChangeListener {
                             CustomToast.ERROR
                         ).show()
                     } else if (validatePassword(newPass) && validatePassword(confirmPass)) {
+                        MyApplication.userId?.let { it1 ->
+                            userViewModel.changePassword(
+                                it1,
+                                curPass,
+                                newPass
+                            )
+                        }
                     }
                 }
             }
@@ -105,18 +149,10 @@ class ChangePassword : Fragment(), OnFocusChangeListener {
         when (item.itemId) {
             android.R.id.home -> {
                 findNavController().popBackStack()
-                Log.d("PopBackStack", "Vaooo")
                 return true
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    private fun changePassword(
-        userId: String,
-        oldPass: String,
-        newPass: String
-    ) {
     }
 
     private fun showLoading(msg: String) {

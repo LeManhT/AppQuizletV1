@@ -7,7 +7,9 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.example.quizletappandroidv1.databinding.ActivityAdminBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ActivityAdmin : AppCompatActivity() {
     private lateinit var binding: ActivityAdminBinding
     private lateinit var navController: NavController

@@ -1,9 +1,11 @@
 package com.example.quizletappandroidv1.ui.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.speech.tts.TextToSpeech
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -74,11 +76,7 @@ class FlashcardLearn : Fragment(), OnClickButton, LearnFlashcardAdapter.onLearnC
         textToSpeech = TextToSpeech(requireContext(), this)
 
         listCards = mutableListOf()
-
-//        // Retrieve listCards from arguments (replace with actual data retrieval)
-//        val jsonList = arguments?.getString("listCard")
-//        listCards = Gson().fromJson(jsonList, object : TypeToken<List<FlashCardModel>>() {}.type)
-//        copiedArr = listCards.toMutableList()
+        copiedArr = mutableListOf()
 
         userViewModel.userData.observe(viewLifecycleOwner) { result ->
             result.onSuccess {
@@ -87,8 +85,11 @@ class FlashcardLearn : Fragment(), OnClickButton, LearnFlashcardAdapter.onLearnC
                     studySet.id == targetId
                 }
                 if (studySetTarget != null) {
+                    binding.txtCount.text = "${1}/${studySetTarget.cards.size}"
                     listCards.clear()
+                    copiedArr.clear()
                     listCards.addAll(studySetTarget.cards)
+                    copiedArr.addAll(studySetTarget.cards)
                     adapterLearn.updateData(studySetTarget.cards)
                 }
 
@@ -141,32 +142,29 @@ class FlashcardLearn : Fragment(), OnClickButton, LearnFlashcardAdapter.onLearnC
     }
 
     private fun showSettingBottomsheet() {
-//        settingFragment.show(childFragmentManager, "")
+//        findNavController().navigate(R.id.action_flashcardLearn_to_learnFlashcardSetting)
+        settingFragment = LearnFlashcardSetting().apply {
+            setOnClickButtonListener(this@FlashcardLearn)
+        }
+        settingFragment.show(parentFragmentManager, "LearnFlashcardSetting")
     }
 
     override fun handleClickModeDisplay() {
-//        isFront = isFront?.not() ?: true
-//        val btnToggleMode = settingFragment.dialog?.findViewById<AppCompatButton>(R.id.btnToggleMode)
-//        if (isFront) {
-//            btnToggleMode?.text = resources.getString(R.string.term)
-//            listCards.forEach { it.isUnMark = false }
-//        } else {
-//            btnToggleMode?.text = resources.getString(R.string.definition)
-//            listCards.forEach { it.isUnMark = true }
-//        }
-//        settingFragment.setIsFront(isFront)
-//        adapterLearn.notifyDataSetChanged()
+        isFront = !isFront
+        listCards.forEach { it.isUnMark = !isFront }
+        adapterLearn.updateData(listCards)
     }
 
     override fun handleClickShuffle() {
         isShuffle = isShuffle?.not() ?: true
+        Log.d("isShuffle", isShuffle.toString())
         if (isShuffle == true) {
             listCards.shuffle()
         } else {
             listCards.clear()
             listCards.addAll(copiedArr)
         }
-        adapterLearn.notifyDataSetChanged()
+        adapterLearn.updateData(listCards)
     }
 
     override fun handleClickPlayAudio() {
@@ -174,7 +172,6 @@ class FlashcardLearn : Fragment(), OnClickButton, LearnFlashcardAdapter.onLearnC
     }
 
     private fun init() {
-        binding.txtCount.text = "${1}/${listCards.size}"
         manager = CardStackLayoutManager(requireContext(), object : CardStackListener {
             override fun onCardDragging(direction: Direction?, ratio: Float) {}
             override fun onCardSwiped(direction: Direction?) {
@@ -264,8 +261,10 @@ class FlashcardLearn : Fragment(), OnClickButton, LearnFlashcardAdapter.onLearnC
         }
     }
 
+    @SuppressLint("DetachAndAttachSameFragment")
     override fun handleResetCard() {
-        requireActivity().recreate()
-//        settingFragment.dismiss()
+        parentFragmentManager.beginTransaction().detach(this).commit()
+        settingFragment.dismiss()
+        parentFragmentManager.beginTransaction().attach(this).commit()
     }
 }

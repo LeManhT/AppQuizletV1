@@ -20,11 +20,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,6 +38,7 @@ import com.example.quizletappandroidv1.models.CreateSetRequest
 import com.example.quizletappandroidv1.models.FlashCardModel
 import com.example.quizletappandroidv1.utils.FileHelperUtils
 import com.example.quizletappandroidv1.utils.Helper
+import com.example.quizletappandroidv1.utils.URIPathHelper
 import com.example.quizletappandroidv1.viewmodel.home.HomeViewModel
 import com.example.quizletappandroidv1.viewmodel.studyset.DocumentViewModel
 import com.github.dhaval2404.imagepicker.ImagePicker
@@ -51,7 +54,12 @@ import com.google.mlkit.nl.translate.TranslatorOptions
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import com.nguyenhoanglam.imagepicker.model.ImagePickerConfig
+import com.nguyenhoanglam.imagepicker.model.IndicatorType
+import com.nguyenhoanglam.imagepicker.model.RootDirectory
+import com.nguyenhoanglam.imagepicker.ui.imagepicker.registerImagePicker
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.CellType
@@ -91,6 +99,30 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
                 }
             }
         }
+
+
+    private var currentPosition: Int = -1
+
+    private val REQUEST_CODE = 101
+
+    private val launcher = registerImagePicker { images ->
+        val image = images[0]
+        // Hoặc tiếp tục xử lý ảnh theo nhu cầu của bạn trên main thread
+        val uriPathHelper = URIPathHelper()
+        val filePath = context?.let { uriPathHelper.getPath(requireContext(), image.uri) }
+        if (images.isNotEmpty()) {
+            processSelectedImage(images[0].uri)
+        }
+    }
+    private val imagePickerConfig = ImagePickerConfig(
+        isFolderMode = false,
+        isShowCamera = true,
+        selectedIndicatorType = IndicatorType.NUMBER,
+        rootDirectory = RootDirectory.DCIM,
+        subDirectory = "Image Picker",
+    )
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -135,9 +167,7 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
 
             }
             }
-// Initialize RecyclerView
         setupRecyclerView()
-// Set up button listeners and other UI elements
         setupUIListeners()
 
         homeViewModel.rankResult.observe(viewLifecycleOwner) { data ->
@@ -156,7 +186,7 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
                     CustomToast.LONG,
                     CustomToast.SUCCESS
                 ).show()
-                findNavController().navigate(R.id.action_createSet_to_studySet)
+                findNavController().navigate(R.id.action_createSet_to_fragmentLibrary2)
             } else {
                 Timber.d("Error: $data")
             }
@@ -346,10 +376,6 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
         adapterCreateSet.notifyDataSetChanged()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-    }
-
     private fun startSpeechRecognition(position: Int) {
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
         intent.putExtra(
@@ -404,6 +430,14 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     startSpeechRecognition(speechRecognitionPosition)
+                } else {
+                    Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    openGallery()
                 } else {
                     Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
                 }
@@ -651,4 +685,52 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
             )
         }
     }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    override fun onChooseImage(position: Int) {
+        currentPosition = position
+        requestStoragePermission()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun requestStoragePermission() {
+        val permission = Manifest.permission.READ_MEDIA_IMAGES
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                permission
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            openGallery()
+        } else {
+            ActivityCompat.requestPermissions(requireActivity(), arrayOf(permission), REQUEST_CODE)
+        }
+    }
+
+
+    private fun openGallery() {
+        launcher.launch(imagePickerConfig)
+    }
+
+    private fun processSelectedImage(uri: Uri) {
+        val uriPathHelper = URIPathHelper()
+        val filePath = context?.let { uriPathHelper.getPath(it, uri) }
+        context?.let { showLoading(resources.getString(R.string.upload_avatar_loading)) }
+        lifecycleScope.launch {
+            try {
+                adapterCreateSet.updateImageUri(currentPosition, uri)
+            } catch (e: Exception) {
+                context?.let {
+                    CustomToast(it).makeText(
+                        it,
+                        e.message.toString(),
+                        CustomToast.LONG,
+                        CustomToast.ERROR
+                    ).show()
+                }
+            } finally {
+                progressDialog.dismiss()
+            }
+        }
+    }
+
 }

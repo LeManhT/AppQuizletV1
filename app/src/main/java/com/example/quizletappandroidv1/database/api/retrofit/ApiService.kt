@@ -9,6 +9,7 @@ import com.example.quizletappandroidv1.models.NoticeModel
 import com.example.quizletappandroidv1.models.RankResultModel
 import com.example.quizletappandroidv1.models.ShareFolderModel
 import com.example.quizletappandroidv1.models.StudySetModel
+import com.example.quizletappandroidv1.models.admin.UserAdmin
 import com.google.gson.JsonObject
 import com.squareup.okhttp.RequestBody
 import retrofit2.Response
@@ -17,7 +18,6 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -169,5 +169,22 @@ interface ApiService {
         @Query("ID") userId: String
     ): Response<UserResponse>
 
+    @GET("Admin/GetUsers")
+    suspend fun getListUserAdmin(
+        @Query("from") from: Int,
+        @Query("to") to: Int
+    ): Response<List<UserResponse>>
+
+    @POST("Admin/SetSuspendUser")
+    suspend fun suspendUser(
+        @Query("userId") userId: String,
+        @Query("suspend") suspend: Boolean
+    )
+
+    @POST("Admin/Login")
+    suspend fun loginAdmin(
+        @Query("loginName") username: String,
+        @Query("password") password: String
+    ): Response<UserAdmin>
 
 }

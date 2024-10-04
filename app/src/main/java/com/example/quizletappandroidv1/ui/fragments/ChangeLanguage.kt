@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -14,6 +15,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.databinding.FragmentChangeLanguageBinding
 import java.util.Locale
 
@@ -75,10 +77,12 @@ class ChangeLanguage : Fragment(), View.OnClickListener {
     }
 
     private fun changeLanguage(selectedLanguage: String): Locale {
+        Log.d("ChangeLanguage", selectedLanguage)
+
         val newLocale = when (selectedLanguage) {
-            "English" -> Locale("en")
-            "Vietnamese" -> Locale("vi")
-            "Chinese" -> Locale("zh")
+            resources.getString(R.string.english) -> Locale("en")
+            resources.getString(R.string.vietnamese) -> Locale("vi")
+            resources.getString(R.string.chinese) -> Locale("zh")
             else -> Locale("en")
         }
         return newLocale
@@ -92,6 +96,9 @@ class ChangeLanguage : Fragment(), View.OnClickListener {
             .show()
         val newLocale = changeLanguage(radioButtonChecked?.text.toString())
         val newLangCode = newLocale.language
+
+        Log.d("ChangeLanguage2", newLangCode)
+
         with(sharedPreferences.edit()) {
             putString(
                 "language",

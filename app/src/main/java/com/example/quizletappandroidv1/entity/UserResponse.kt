@@ -13,6 +13,8 @@ class UserResponse(
     val loginName: String,
     @SerializedName("loginPassword")
     val loginPassword: String,
+    @SerializedName("isSuspend")
+    val isSuspend: Boolean,
     @SerializedName("userName")
     val userName: String,
     @SerializedName("email")

@@ -1,8 +1,10 @@
 package com.example.quizletappandroidv1.adapter
 
+import android.net.Uri
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.chauthai.swipereveallayout.ViewBinderHelper
@@ -22,8 +24,8 @@ class CreateSetItemAdapter(
         fun onIconClick(position: Int)
         fun onTranslateIconClick(position: Int, currentText: String)
         fun onDeleteClick(position: Int)
-
         fun onAddNewCard(position: Int)
+        fun onChooseImage(position: Int)
     }
 
     private var onIconClickListener: OnIconClickListener? = null
@@ -45,8 +47,6 @@ class CreateSetItemAdapter(
 
     override fun onBindViewHolder(holder: CreateSetItemHolder, position: Int) {
         viewBinderHelper.closeLayout(listSet[position].timeCreated.toString())
-        val currentDateTime: java.util.Date = java.util.Date()
-        val currentTimestamp: Long = currentDateTime.time
         viewBinderHelper.bind(
             holder.binding.swipeRevealLayout,
             listSet[position].timeCreated.toString()
@@ -55,11 +55,18 @@ class CreateSetItemAdapter(
         val txtTerm = holder.binding.edtTerm
         val txtDefinition = holder.binding.edtDefinition
 
+        listSet[position].imageUri?.let { uri ->
+            holder.binding.imgFlashcard.setImageURI(uri)
+        }
 
-//        holder.binding.textFieldDefinition.setEndIconOnClickListener {
-//            isDefinition = true
-//            onIconClickListener?.onIconClick(position)
-//        }
+        if (listSet[position].imageUri != null) {
+            holder.binding.imgFlashcard.apply {
+                visibility = View.VISIBLE
+                setImageURI(listSet[position].imageUri)
+            }
+        } else {
+            holder.binding.imgFlashcard.visibility = View.GONE
+        }
 
         holder.binding.btnVoiceTerm.setOnClickListener {
             isDefinition = false
@@ -81,6 +88,10 @@ class CreateSetItemAdapter(
             onIconClickListener?.onTranslateIconClick(position, txtDefinition.text.toString())
         }
 
+        holder.binding.txtChooseImageFlashCard.setOnClickListener {
+            onIconClickListener?.onChooseImage(position)
+        }
+
 
 
         holder.binding.btnAddNewCard.setOnClickListener {
@@ -88,7 +99,6 @@ class CreateSetItemAdapter(
         }
 
         val currentItem = listSet[position]
-        // Convert the String to Editable
         val editableTerm = Editable.Factory.getInstance().newEditable(currentItem.term)
         val editableDesc = Editable.Factory.getInstance().newEditable(currentItem.definition)
         txtTerm.text = editableTerm
@@ -102,14 +112,12 @@ class CreateSetItemAdapter(
             override fun beforeTextChanged(
                 charSequence: CharSequence?, start: Int, count: Int, after: Int
             ) {
-                // Không cần thực hiện gì ở đây
+
             }
 
             override fun onTextChanged(
                 charSequence: CharSequence?, start: Int, before: Int, count: Int
             ) {
-                // Cập nhật dữ liệu trong listSet khi có sự thay đổi
-
                 listSet.getOrNull(holder.adapterPosition)?.term = charSequence.toString()
             }
 
@@ -127,7 +135,6 @@ class CreateSetItemAdapter(
             override fun onTextChanged(
                 charSequence: CharSequence?, start: Int, before: Int, count: Int
             ) {
-                // Cập nhật dữ liệu trong listSet khi có sự thay đổi
                 listSet.getOrNull(holder.adapterPosition)?.definition = charSequence.toString()
             }
 
@@ -145,33 +152,6 @@ class CreateSetItemAdapter(
         }
     }
 
-
-    // Add this function to start speech recognition
-
-
-    // Add this function to handle the result of speech recognition
-//    fun handleSpeechRecognitionResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        Log.d("go","hahaha")
-//        if (requestCode == REQUEST_CODE_SPEECH_INPUT) {
-//            if (resultCode == Activity.RESULT_OK && data != null) {
-//                val res: ArrayList<String>? =
-//                    data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as? ArrayList<String>
-//
-//                // Assuming that the user wants to update the term field
-//                val positionToUpdate = 0 // Change this to the desired position
-//                if (positionToUpdate < listSet.size && res != null && res.isNotEmpty()) {
-//                    val spokenText = res[0]
-//
-//                    // Update both term and definition fields
-//                    listSet[positionToUpdate].term = spokenText
-//                    listSet[positionToUpdate].definition = spokenText
-//
-//                    // Notify the adapter that the data has changed
-//                    notifyDataSetChanged()
-//                }
-//            }
-//        }
-//    }
     fun setOnIconClickListener(listener: OnIconClickListener) {
         this.onIconClickListener = listener
     }
@@ -198,5 +178,13 @@ class CreateSetItemAdapter(
         this.listSet = newList
         notifyDataSetChanged()
     }
+
+    fun updateImageUri(position: Int, uri: Uri) {
+        if (position in listSet.indices) {
+            (listSet as MutableList)[position].imageUri = uri
+            notifyItemChanged(position)
+        }
+    }
+
 
 }

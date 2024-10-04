@@ -1,5 +1,6 @@
 package com.example.quizletappandroidv1.adapter.admin
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,16 +8,15 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quizletappandroidv1.R
-import com.example.quizletappandroidv1.models.admin.UserAdmin
+import com.example.quizletappandroidv1.entity.UserResponse
 
 class ManageUserAdapter(
-    private val userList: List<UserAdmin>,
     private val onUserAdminClick: IUserAdminClick
 ) : RecyclerView.Adapter<ManageUserAdapter.UserViewHolder>() {
-
+    private var userList: List<UserResponse> = mutableListOf()
     interface IUserAdminClick {
-        fun handleEditClick(user: UserAdmin)
-        fun handleDeleteClick(user: UserAdmin)
+        fun handleEditClick(user: UserResponse)
+        fun handleDeleteClick(user: UserResponse)
     }
 
     class UserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -49,4 +49,11 @@ class ManageUserAdapter(
     override fun getItemCount(): Int {
         return userList.size
     }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateData(newList: List<UserResponse>) {
+        this.userList = newList
+        notifyDataSetChanged()
+    }
+
 }

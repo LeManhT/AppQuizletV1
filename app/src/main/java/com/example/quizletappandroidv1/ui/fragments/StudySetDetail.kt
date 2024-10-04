@@ -42,7 +42,6 @@ import com.example.quizletappandroidv1.receiver.DownloadSuccessReceiver
 import com.example.quizletappandroidv1.utils.Helper
 import com.example.quizletappandroidv1.viewmodel.studyset.DocumentViewModel
 import com.example.quizletappandroidv1.viewmodel.user.UserViewModel
-import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -63,7 +62,6 @@ class StudySetDetail : Fragment(), TextToSpeech.OnInitListener,
     private lateinit var binding: FragmentStudySetDetailBinding
     private lateinit var progressDialog: ProgressDialog
 
-    //    private lateinit var setId: String
     private lateinit var textToSpeech: TextToSpeech
     private lateinit var adapterStudySet: StudySetItemAdapter
     private lateinit var adapterFlashcardDetail: FlashcardItemAdapter
@@ -579,10 +577,8 @@ class StudySetDetail : Fragment(), TextToSpeech.OnInitListener,
     }
 
     override fun onClickZoomBtn() {
-        val jsonList = Gson().toJson(listCards)
-        val i = Intent(requireContext(), FlashcardLearn::class.java)
-        i.putExtra("listCard", jsonList)
-        startActivity(i)
+        val action = StudySetDetailDirections.actionStudySetDetailToFlashcardLearn(args.setId)
+        findNavController().navigate(action)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

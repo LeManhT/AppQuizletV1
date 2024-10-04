@@ -455,4 +455,7 @@ class FragmentEditSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
         }
     }
 
+    override fun onChooseImage(position: Int) {
+        TODO("Not yet implemented")
+    }
 }

@@ -1,60 +1,87 @@
 package com.example.quizletappandroidv1.ui.fragments
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
+import com.example.quizletappandroidv1.MyApplication
 import com.example.quizletappandroidv1.R
+import com.example.quizletappandroidv1.adapter.QuoteLocalAdapter
+import com.example.quizletappandroidv1.databinding.FragmentMyQuoteBinding
+import com.example.quizletappandroidv1.viewmodel.quote.QuoteViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [FragmentMyQuote.newInstance] factory method to
- * create an instance of this fragment.
- */
-class FragmentMyQuote : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+@AndroidEntryPoint
+class MyQuoteFragment : Fragment(), QuoteLocalAdapter.OnQuotifyLocalListener {
+    private lateinit var quoteAdapter: QuoteLocalAdapter
+    private lateinit var binding: FragmentMyQuoteBinding
+    private val myViewModel: QuoteViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_my_quote, container, false)
+    ): View {
+        binding = FragmentMyQuoteBinding.inflate(layoutInflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FragmentMyQuote.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FragmentMyQuote().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        MyApplication.userId?.let { myViewModel.getLocalQuotes(it) }
+
+        quoteAdapter = QuoteLocalAdapter(myViewModel, binding.rvQuote)
+        quoteAdapter.setOnQuoteShareListener(this)
+        binding.rvQuote.adapter = quoteAdapter
+        binding.rvQuote.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        val snapHelperQuotify = PagerSnapHelper()
+        snapHelperQuotify.attachToRecyclerView(binding.rvQuote)
+
+        myViewModel.localQuote.observe(viewLifecycleOwner) {
+            if (myViewModel.localQuote.value?.isEmpty() == true) {
+                binding.rvQuote.visibility = View.GONE
+                binding.layoutNoData.visibility = View.VISIBLE
+            } else {
+                binding.rvQuote.visibility = View.VISIBLE
+                binding.layoutNoData.visibility = View.GONE
             }
+            quoteAdapter.notifyDataSetChanged()
+        }
+
+        binding.txtCreateNewSet.setOnClickListener {
+            val i = Intent(requireContext(), CreateQuote::class.java)
+            startActivity(i)
+        }
+
+        binding.txtBack.setOnClickListener {
+            requireActivity().onBackPressed()
+        }
+    }
+
+    override fun handleShareQuote(position: Int) {
+        val quoteText = quoteAdapter.getQuoteText(position)
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, quoteText.joinToString("\n"))
+            type = "text/plain"
+        }
+        startActivity(Intent.createChooser(sendIntent, null))
+    }
+
+    override fun handleDeleteQuote(quoteId: Long) {
+        MaterialAlertDialogBuilder(requireContext()).setTitle(resources.getString(R.string.warning))
+            .setMessage(resources.getString(R.string.confirm_delete_quote))
+            .setNeutralButton(resources.getString(R.string.cancel)) { dialog, _ ->
+                dialog.dismiss()
+            }.setPositiveButton(resources.getString(R.string.accept)) { _, _ ->
+                myViewModel.deleteQuote(quoteId)
+            }.show()
     }
 }

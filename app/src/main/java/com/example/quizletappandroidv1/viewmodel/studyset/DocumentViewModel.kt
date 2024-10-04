@@ -67,6 +67,14 @@ class DocumentViewModel @Inject constructor(private val documentRepository: Docu
     val isPublic: LiveData<Boolean> = _isPublic
 
 
+    private val _isFrontSide = MutableLiveData<Boolean>().apply { value = true }  // Default to front side
+    val isFrontSide: LiveData<Boolean> get() = _isFrontSide
+
+    // Toggle front/back
+    fun toggleFlashcardSide() {
+        _isFrontSide.value = _isFrontSide.value?.not()
+    }
+
     fun loadStudySets(userId: String) {
         viewModelScope.launch {
 // val sets = studySetRepository.getAllStudySets(userId)

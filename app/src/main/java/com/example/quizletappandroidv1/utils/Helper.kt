@@ -7,6 +7,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Build
+import android.util.Patterns
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
@@ -15,9 +16,15 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.entity.UserResponse
 import com.example.quizletappandroidv1.models.FlashCardModel
+import com.example.quizletappandroidv1.models.Story
 import com.example.quizletappandroidv1.models.StudySetModel
+import com.google.android.material.textfield.TextInputLayout
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.io.InputStreamReader
 import java.security.SecureRandom
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -194,6 +201,27 @@ object Helper {
         for (view in views) {
             view.visibility = View.GONE
         }
+    }
+
+    fun validateEmail(context: Context, email: String, inputLayout: TextInputLayout): Boolean {
+        var errorMessage: String? = null
+        if (email.trim().isEmpty()) {
+            errorMessage = context.getString(R.string.errBlankEmail)
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()) {
+            errorMessage = context.getString(R.string.errEmailInvalid)
+        }
+        inputLayout.apply {
+            isErrorEnabled = errorMessage != null
+            error = errorMessage
+        }
+        return errorMessage == null
+    }
+
+    fun getStories(context: Context): List<Story> {
+        val inputStream = context.resources.openRawResource(R.raw.stories)
+        val reader = InputStreamReader(inputStream)
+        val storyType = object : TypeToken<List<Story>>() {}.type
+        return Gson().fromJson(reader, storyType)
     }
 
 

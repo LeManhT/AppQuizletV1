@@ -22,6 +22,15 @@
             android:name="tabSelected"
             android:defaultValue="0"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_fragmentLibrary2_to_excellent2"
+            app:destination="@id/excellent2" />
+        <action
+            android:id="@+id/action_fragmentLibrary2_to_studySetDetail"
+            app:destination="@id/studySetDetail" />
+        <action
+            android:id="@+id/action_fragmentLibrary2_to_createSet"
+            app:destination="@id/createSet" />
 
 
     </fragment>
@@ -136,6 +145,9 @@
         <action
             android:id="@+id/action_createSet_to_studySet"
             app:destination="@id/studySet" />
+        <action
+            android:id="@+id/action_createSet_to_fragmentLibrary2"
+            app:destination="@id/fragmentLibrary2" />
     </fragment>
     <fragment
         android:id="@+id/translate"
@@ -197,6 +209,12 @@
         <action
             android:id="@+id/action_fragmentMyQuote_to_fragmentHome3"
             app:destination="@id/fragmentHome3" />
+        <action
+            android:id="@+id/action_fragmentMyQuote_to_quoteInLanguage"
+            app:destination="@id/quoteInLanguage" />
+        <action
+            android:id="@+id/action_fragmentMyQuote_to_createQuote"
+            app:destination="@id/createQuote" />
     </fragment>
     <fragment
         android:id="@+id/quoteInLanguage"
@@ -205,6 +223,12 @@
         <action
             android:id="@+id/action_quoteInLanguage_to_fragmentHome3"
             app:destination="@id/fragmentHome3" />
+        <action
+            android:id="@+id/action_quoteInLanguage_to_fragmentMyQuote"
+            app:destination="@id/fragmentMyQuote" />
+        <action
+            android:id="@+id/action_quoteInLanguage_to_createQuote"
+            app:destination="@id/createQuote" />
     </fragment>
     <fragment
         android:id="@+id/fragmentSolution"
@@ -215,8 +239,9 @@
             android:id="@+id/action_fragmentSolution_to_solutionListFragment"
             app:destination="@id/solutionListFragment" />
         <argument
-            android:name="imageResource"
-            app:argType="integer" />
+            android:name="story"
+            app:argType="com.example.quizletappandroidv1.models.Story" />
+
     </fragment>
     <fragment
         android:id="@+id/solutionListFragment"
@@ -315,6 +340,9 @@
         <action
             android:id="@+id/action_studySetDetail_to_fragmentWelcomeToLearn"
             app:destination="@id/fragmentWelcomeToLearn" />
+        <action
+            android:id="@+id/action_studySetDetail_to_fragmentLibrary2"
+            app:destination="@id/fragmentLibrary2" />
     </fragment>
     <fragment
         android:id="@+id/fragmentWelcomeToLearn"
@@ -353,11 +381,18 @@
         <argument
             android:name="setId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_flashcardLearn_to_learnFlashcardSetting"
+            app:destination="@id/learnFlashcardSetting" />
     </fragment>
     <fragment
         android:id="@+id/learnFlashcardSetting"
         android:name="com.example.quizletappandroidv1.ui.fragments.LearnFlashcardSetting"
-        android:label="LearnFlashcardSetting" />
+        android:label="LearnFlashcardSetting" >
+        <action
+            android:id="@+id/action_learnFlashcardSetting_to_flashcardLearn"
+            app:destination="@id/flashcardLearn" />
+    </fragment>
     <fragment
         android:id="@+id/fragmentCreatedSet"
         android:name="com.example.quizletappandroidv1.ui.fragments.FragmentCreatedSet"
@@ -395,7 +430,11 @@
     <fragment
         android:id="@+id/excellent2"
         android:name="com.example.quizletappandroidv1.ui.fragments.Excellent"
-        android:label="Excellent" />
+        android:label="Excellent" >
+        <action
+            android:id="@+id/action_excellent2_to_fragmentLibrary2"
+            app:destination="@id/fragmentLibrary2" />
+    </fragment>
 
     <fragment
         android:id="@+id/studySet"
@@ -429,5 +468,16 @@
         <argument
             android:name="editSetId"
             app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/createQuote"
+        android:name="com.example.quizletappandroidv1.ui.fragments.CreateQuote"
+        android:label="CreateQuote" >
+        <action
+            android:id="@+id/action_createQuote_to_quoteInLanguage"
+            app:destination="@id/quoteInLanguage" />
+        <action
+            android:id="@+id/action_createQuote_to_fragmentMyQuote"
+            app:destination="@id/fragmentMyQuote" />
     </fragment>
 </navigation>

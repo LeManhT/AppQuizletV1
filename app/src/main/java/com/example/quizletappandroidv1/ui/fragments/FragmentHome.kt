@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -14,18 +16,21 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.appquizlet.interfaceFolder.RVStudySetItem
+import com.example.appquizlet.model.SearchSetModel
 import com.example.quizletappandroidv1.MyApplication
 import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.adapter.AdapterCustomDatePicker
 import com.example.quizletappandroidv1.adapter.DayOfWeekAdapter
 import com.example.quizletappandroidv1.adapter.RVFolderItemAdapter
 import com.example.quizletappandroidv1.adapter.RvStudySetItemAdapter
+import com.example.quizletappandroidv1.adapter.SearchListAdapter
 import com.example.quizletappandroidv1.custom.CustomDialog
 import com.example.quizletappandroidv1.custom.CustomToast
 import com.example.quizletappandroidv1.custom.EqualSpacingItemDecoration
@@ -42,6 +47,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -55,7 +61,9 @@ class FragmentHome : Fragment() {
     private lateinit var adapterHomeFolder: RVFolderItemAdapter
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var sharedPreferencesTheme: SharedPreferences
-    private var apiCallsInProgress = false
+    private lateinit var adapterSearchSet: SearchListAdapter
+    private var studysetLists: MutableList<SearchSetModel> = mutableListOf()
+
 
     private val documentViewModel: DocumentViewModel by viewModels()
     private val homeViewModel: HomeViewModel by viewModels()
@@ -88,6 +96,7 @@ class FragmentHome : Fragment() {
         }
 
         MyApplication.userId?.let { userViewModel.getUserData(it) }
+        documentViewModel.getAllStudySets()
 
         binding.textView9.setOnClickListener {
             val successIcon = ContextCompat.getDrawable(requireContext(), R.drawable.vietnam_flag)
@@ -108,8 +117,6 @@ class FragmentHome : Fragment() {
 
         homeViewModel.rankResult.observe(viewLifecycleOwner) { result ->
             result.onSuccess { it ->
-                Log.d("Successs", Gson().toJson(it))
-
                 val podiumView: PodiumView = view.findViewById(R.id.podiumView)
                 podiumView.setPodiumData(
                     it, it, it,
@@ -139,13 +146,6 @@ class FragmentHome : Fragment() {
                 }
             }.onFailure {
 
-            }
-        }
-
-        binding.searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                binding.searchView.clearFocus()
-                findNavController().navigate(R.id.action_fragmentHome3_to_fragmentSearch)
             }
         }
 
@@ -373,7 +373,78 @@ class FragmentHome : Fragment() {
             }
         }
 
+        lifecycleScope.launch {
+            documentViewModel.allStudySets.observe(viewLifecycleOwner) { contacts ->
+                run {
+                    if (contacts.isEmpty()) {
+                        binding.layoutNoData.visibility = View.VISIBLE
+                        binding.rvSearchStudySet.visibility = View.GONE
+                        binding.layoutNoDataSearch.visibility = View.VISIBLE
+                    } else {
+                        binding.layoutNoData.visibility = View.GONE
+                        binding.rvSearchStudySet.visibility = View.VISIBLE
+                        binding.layoutNoDataSearch.visibility = View.GONE
+                    }
+                    adapterSearchSet =
+                        SearchListAdapter(object : SearchListAdapter.ISearchSetClick {
+                            override fun handleSearchSetClick(studyset: SearchSetModel) {
 
+                            }
+                        })
+
+                    binding.rvSearchStudySet.layoutManager =
+                        LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+                    binding.rvSearchStudySet.adapter = adapterSearchSet
+
+                    adapterSearchSet.updateData(contacts)
+                    studysetLists.clear()
+                    studysetLists.addAll(contacts)
+
+                    binding.searchView.editText.addTextChangedListener(object :
+                        TextWatcher {
+                        override fun beforeTextChanged(
+                            s: CharSequence?, start: Int, count: Int, after: Int
+                        ) {
+                            // Trước khi văn bản thay đổi
+                        }
+
+                        override fun onTextChanged(
+                            s: CharSequence?, start: Int, before: Int, count: Int
+                        ) {
+                            if (s?.isEmpty() == true) {
+                                studysetLists.clear()
+                                studysetLists.addAll(contacts)
+                                adapterSearchSet.updateData(studysetLists)
+                            } else {
+                                searchSets(s.toString())
+                            }
+                        }
+
+                        override fun afterTextChanged(s: Editable?) {
+                            // Sau khi văn bản thay đổi
+                        }
+                    })
+                }
+            }
+        }
+
+        documentViewModel.studySetSearchResults.observe(viewLifecycleOwner) { filteredContacts ->
+            if (filteredContacts.isEmpty()) {
+                binding.rvSearchStudySet.visibility = View.GONE
+                binding.layoutNoDataSearch.visibility = View.VISIBLE
+            } else {
+                binding.rvSearchStudySet.visibility = View.VISIBLE
+                binding.layoutNoDataSearch.visibility = View.GONE
+            }
+            adapterSearchSet.updateData(filteredContacts)
+        }
+
+    }
+
+    private fun searchSets(query: String) {
+        lifecycleScope.launch {
+            documentViewModel.findStudySet(query)
+        }
     }
 
     private fun showDialogBottomSheet() {

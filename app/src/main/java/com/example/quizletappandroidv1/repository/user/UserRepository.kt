@@ -31,7 +31,6 @@ class UserRepository @Inject constructor(private val apiService: ApiService) {
                 Result.success("Sign-up successful")
             } else {
                 val errorMessage = result.errorBody()?.string() ?: "Unknown error"
-                Log.d("ERRRORRR", errorMessage.toString())
                 Result.failure(Exception(errorMessage))
             }
         } catch (e: IOException) {
@@ -119,17 +118,14 @@ class UserRepository @Inject constructor(private val apiService: ApiService) {
             val result = apiService.getUserData(userId)
 
             if (result.isSuccessful) {
-                Log.d("APIPPPP",Gson().toJson(result.body()!!))
                 Result.success(result.body()!!)
             } else {
                 val errorBody = result.errorBody()?.string() ?: "No error body"
                 Timber.tag("API_ERROR").e("Error: $errorBody, Code: ${result.code()}")
-                Log.d("APIPPPP1",Gson().toJson(result.body()!!) + "errroe")
                 Result.failure(Exception(errorBody))
             }
         } catch (e: Exception) {
             Timber.tag("API_EXCEPTION").e("Exception: ${e.message}")
-            Log.d("APIPPPP2",Gson().toJson(e.message) + "errroe")
             Result.failure(e)
         }
     }

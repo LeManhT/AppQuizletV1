@@ -25,7 +25,7 @@
                 android:layout_height="80dp"
                 android:layout_gravity="center_vertical"
                 android:contentDescription="@string/profile_picture"
-                android:src="@drawable/user" />
+                android:src="@raw/admin" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -44,7 +44,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/txtProfilePhone"
+                    android:id="@+id/txtProfileEmail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="+880 1768 632 121"
@@ -190,13 +190,25 @@
                         android:gravity="center_vertical"
                         android:paddingHorizontal="@dimen/mar_15"
                         android:paddingVertical="15dp"
-                        android:text="FAQs"
+                        android:text="@string/term_service"
                         android:textColor="@color/txt_black_primary"
                         android:textSize="14sp"
                         app:drawableEndCompat="@drawable/forward" />
                 </LinearLayout>
             </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnLogout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@color/btn_primary"
+                android:text="@string/log_out"
+                android:layout_marginTop="@dimen/pad_20"
+                android:textAllCaps="false"
+                android:textColor="@color/white" />
         </LinearLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

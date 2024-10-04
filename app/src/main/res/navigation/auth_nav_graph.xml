@@ -36,5 +36,16 @@
         <action
             android:id="@+id/action_startAppFragment_to_signUp2"
             app:destination="@id/signUp2" />
+        <action
+            android:id="@+id/action_startAppFragment_to_fragmentLoginAdmin"
+            app:destination="@id/fragmentLoginAdmin" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentLoginAdmin"
+        android:name="com.example.quizletappandroidv1.ui.admin.FragmentLoginAdmin"
+        android:label="FragmentLoginAdmin" >
+        <action
+            android:id="@+id/action_fragmentLoginAdmin_to_startAppFragment"
+            app:destination="@id/startAppFragment" />
     </fragment>
 </navigation>

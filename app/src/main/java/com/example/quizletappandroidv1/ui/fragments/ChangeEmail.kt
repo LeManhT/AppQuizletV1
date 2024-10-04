@@ -2,7 +2,6 @@ package com.example.quizletappandroidv1.ui.fragments
 
 import android.app.ProgressDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -11,11 +10,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.example.quizletappandroidv1.MyApplication
 import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.custom.CustomToast
 import com.example.quizletappandroidv1.databinding.FragmentChangeEmailBinding
-import com.example.quizletappandroidv1.utils.Helper
 import com.example.quizletappandroidv1.viewmodel.user.UserViewModel
+import timber.log.Timber
 
 class ChangeEmail : Fragment() {
     private lateinit var binding: FragmentChangeEmailBinding
@@ -57,17 +57,26 @@ class ChangeEmail : Fragment() {
                         CustomToast.WARNING
                     ).show()
                 } else {
-                    changeEmail(Helper.getDataUserId(requireContext()), newEmail)
+                    MyApplication.userId?.let { it1 -> userViewModel.changeEmail(it1, newEmail) }
                 }
             }
         }
-        binding.txtSave.setOnClickListener {
-            findNavController().popBackStack()
-            Log.d("PopBackStack", "txtBackEmail")
+
+        userViewModel.changeEmailResult.observe(viewLifecycleOwner) { success ->
+            if (success) {
+                CustomToast(requireContext()).makeText(
+                    requireContext(),
+                    resources.getString(R.string.change_email_success),
+                    CustomToast.LONG,
+                    CustomToast.SUCCESS
+                ).show()
+                findNavController().popBackStack()
+            } else {
+                Timber.d("Change email failed")
+            }
         }
     }
 
-    private fun changeEmail(userId: String, newEmail: String) {}
     private fun showLoading(msg: String) {
         progressDialog = ProgressDialog.show(requireContext(), null, msg)
     }

@@ -1,60 +1,111 @@
 package com.example.quizletappandroidv1.ui.admin
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.example.quizletappandroidv1.R
+import com.example.quizletappandroidv1.databinding.FragmentProfileAdminBinding
+import com.example.quizletappandroidv1.ui.activity.AuthActivity
+import com.example.quizletappandroidv1.viewmodel.admin.AdminViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ProfileAdmin.newInstance] factory method to
- * create an instance of this fragment.
- */
+@AndroidEntryPoint
 class ProfileAdmin : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
-
+    private val adminViewModel: AdminViewModel by activityViewModels()
+    private lateinit var binding: FragmentProfileAdminBinding
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile_admin, container, false)
+        binding = FragmentProfileAdminBinding.inflate(layoutInflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ProfileAdmin.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ProfileAdmin().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        adminViewModel.loginAdminResult.observe(viewLifecycleOwner) { result ->
+            result.onSuccess {
+                binding.txtProfileEmail.text = it.loginName
+                binding.txtProfileName.text = resources.getString(R.string.hello, it.userName)
+            }.onFailure {
+                Timber.e(it, "Get user failed")
+            }
+        }
+
+        binding.layoutTerm.setOnClickListener {
+            val termsOfServiceUrl = "https://quizlet.com/tos"
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(termsOfServiceUrl))
+            startActivity(intent)
+        }
+
+        binding.layoutPolicy.setOnClickListener {
+            val privacyPolicyUrl = "https://quizlet.com/privacy"
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyUrl))
+            startActivity(intent)
+        }
+
+        binding.layoutFaq.setOnClickListener {
+            val faqUrl = "https://quizlet.com/faq"
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(faqUrl))
+            startActivity(intent)
+
+        }
+
+        binding.btnLogout.setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(resources.getString(R.string.title))
+                .setMessage(resources.getString(R.string.are_u_sure_logout))
+                .setNeutralButton(resources.getString(R.string.cancel)) { dialog, which ->
+                    dialog.dismiss()
+                }
+                .setPositiveButton(resources.getString(R.string.accept)) { dialog, which ->
+                    val intent = Intent(requireContext(), AuthActivity::class.java)
+                    startActivity(intent)
+                    requireActivity().finish()
+                }
+                .show()
+
+        }
+
+        binding.languageSelector.setOnClickListener {
+            showLanguageSelectionDialog()
+        }
+
+    }
+
+    private fun showLanguageSelectionDialog() {
+        val languages = arrayOf(
+            resources.getString(R.string.vietnamese),
+            resources.getString(R.string.english),
+            resources.getString(R.string.chinese)
+        )
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.select_language)
+            .setItems(languages) { dialog, which ->
+                when (which) {
+                    0 -> {
+                        // Handle Vietnamese selection
+                    }
+
+                    1 -> {
+                        // Handle English selection
+                    }
+
+                    2 -> {
+                        // Handle Chinese selection
+                    }
                 }
             }
+            .show()
     }
+
 }

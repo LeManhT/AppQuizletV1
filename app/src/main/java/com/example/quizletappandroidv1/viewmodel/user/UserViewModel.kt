@@ -28,6 +28,12 @@ class UserViewModel @Inject constructor(
     private val _userData = MutableLiveData<Result<UserResponse>>()
     val userData: LiveData<Result<UserResponse>> = _userData
 
+    private val _changeEmailResult = MutableLiveData<Boolean>()
+    val changeEmailResult: LiveData<Boolean> = _changeEmailResult
+
+    private val _changePassResult = MutableLiveData<Boolean>()
+    val changePassResult: LiveData<Boolean> = _changePassResult
+
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun createUser(email: String, pass: String, dob: String) {
         viewModelScope.launch {
@@ -51,7 +57,15 @@ class UserViewModel @Inject constructor(
                 oldPass,
                 newPass
             )
-            _loginResult.postValue(result)
+            Log.d("result", result.isSuccess.toString())
+            _changePassResult.postValue(result.isSuccess)
+        }
+    }
+
+    fun changeEmail(userId: String, newEmail: String) {
+        viewModelScope.launch {
+            val result = userRepository.changeEmail(userId, newEmail)
+            _changeEmailResult.postValue(result.isSuccess)
         }
     }
 

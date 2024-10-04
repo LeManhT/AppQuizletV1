@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
-
 
     <com.chauthai.swipereveallayout.SwipeRevealLayout
         android:id="@+id/swipeRevealLayout"
@@ -165,11 +163,29 @@
                     android:textAllCaps="true"
                     android:textColor="@color/txt_black_in_card"
                     android:textSize="@dimen/titleSizeCard2" />
-            </LinearLayout>
-        </LinearLayout>
 
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/txtChooseImageFlashCard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:drawableStart="@drawable/camera"
+                android:drawablePadding="@dimen/mar_10"
+                android:text="@string/choose_image"
+                android:textAllCaps="true"
+                android:textColor="@color/btn_primary"
+                android:textSize="@dimen/titleSizeCard2" />
+
+            <ImageView
+                android:id="@+id/imgFlashcard"
+                android:layout_width="wrap_content"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:src="@raw/ac101"
+                android:visibility="gone" />
+        </LinearLayout>
 
     </com.chauthai.swipereveallayout.SwipeRevealLayout>
 </LinearLayout>
-
-

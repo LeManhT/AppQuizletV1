@@ -3,7 +3,6 @@ package com.example.quizletappandroidv1.ui.fragments
 import android.Manifest
 import android.app.ProgressDialog
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -20,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.quizletappandroidv1.MyApplication
 import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.adapter.AdapterCustomDatePicker
@@ -88,7 +88,6 @@ class Profile : Fragment() {
         )
         initViews()
         loadUserData()
-        loadAchievements()
         return binding.root
     }
 
@@ -195,11 +194,6 @@ class Profile : Fragment() {
     }
 
     private fun loadUserData() {
-        //        UserM.getUserData().observe(viewLifecycleOwner) { userData -> //
-        //        binding.txtUsername.text = userData.loginName //
-        // Load user avatar if necessary //        } // //
-        // UserM.getDataRanking().observe(viewLifecycleOwner) { //
-        // currentPoint = it.currentScore //            configureUserRank() //        }
         userViewModel.userData.observe(viewLifecycleOwner) { result ->
             run {
                 result.onSuccess {
@@ -233,25 +227,6 @@ class Profile : Fragment() {
                 }
             }.onFailure { }
         }
-    }
-
-    private fun loadAchievements() {
-        val today = java.time.LocalDate.now()
-        val achievedDays =
-            mutableListOf<String>()
-
-        //        UserM.getDataAchievements().observe(viewLifecycleOwner) { //
-        //        binding.txtCountStreak.text = "${it.streak.currentStreak}-days streak" // //
-        //        val startStreakDate = today.minusDays(it.streak.currentStreak.toLong()) //
-        //        for (i in 0 until it.streak.currentStreak) { //
-        //        achievedDays.add(startStreakDate.plusDays(i.toLong()).format(DateTimeFormatter.ofPattern("d")))
-        //            } // //            val sundayOfLastWeek = today.minusWeeks(1).with(DayOfWeek.SUNDAY) //
-        //            val formattedDays = (0 until 7).map { //
-        //            sundayOfLastWeek.plusDays(it.toLong()).format(DateTimeFormatter.ofPattern("d")) //
-        //            } // //            val dayAdapter = AdapterCustomDatePicker(formattedDays, achievedDays) //
-        //            binding.rvCustomDatePicker.layoutManager = //
-        //            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false) //
-        //            binding.rvCustomDatePicker.adapter = dayAdapter //        }
     }
 
     private fun configureUserRank() {
@@ -298,10 +273,7 @@ class Profile : Fragment() {
             try {
                 val base64String = filePath?.let { convertFileToBase64(it) }
                 val requestBody = createAvatarRequestBody(base64String)
-//                val result =
-//                    apiService.updateUserInfo(Helper.getDataUserId(requireContext()), requestBody)
-
-//                handleApiResponse(result, uri)
+                Glide.with(this@Profile).load(uri).into(binding.imgAvatar)
             } catch (e: Exception) {
                 context?.let {
                     CustomToast(it).makeText(
@@ -322,28 +294,27 @@ class Profile : Fragment() {
         return okhttp3.RequestBody.create("application/json".toMediaTypeOrNull(), json)
     }
 
-//    private fun handleApiResponse(result: Response<UpdateUserResponse>, uri: Uri) {
-//        if (result.isSuccessful) {
-//            context?.let {
-//                CustomToast(it).makeText(
-//                    it,
-//                    resources.getString(R.string.upload_avatar),
-//                    CustomToast.LONG,
-//                    CustomToast.SUCCESS
-//                ).show()
-//                Glide.with(this).load(uri).into(binding.imgAvatar)
-//            }
-//        } else {
-//            context?.let {
-//                CustomToast(it).makeText(
-//                    it,
-//                    resources.getString(R.string.upload_avatar_err),
-//                    CustomToast.LONG,
-//                    CustomToast.ERROR
-//                ).show()
-//            }
-//        }
-//    }
+    @Deprecated("Deprecated in Java")
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openGallery()
+            } else {
+                CustomToast(requireContext()).makeText(
+                    requireContext(),
+                    "Permission to access storage is required to select an image.",
+                    CustomToast.LONG,
+                    CustomToast.ERROR
+                ).show()
+            }
+        }
+    }
+
 
     private fun showLoading(context: Context, msg: String) {
         progressDialog = ProgressDialog.show(context, null, msg)
@@ -364,10 +335,4 @@ class Profile : Fragment() {
     private fun updateStreakText(streakCount: Int) {
         binding.txtCountStreak.text = "$streakCount-days streak"
     }
-
-
-    companion object {
-        const val TAG = "ProfileFragment"
-    }
-
 }

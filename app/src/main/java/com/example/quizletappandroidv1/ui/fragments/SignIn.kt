@@ -13,11 +13,11 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresExtension
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.example.quizletappandroidv1.ActivityAdmin
 import com.example.quizletappandroidv1.MainActivity
 import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.custom.CustomToast
 import com.example.quizletappandroidv1.databinding.FragmentSignInBinding
-import com.example.quizletappandroidv1.ui.admin.ActivityAdminDashboard
 import com.example.quizletappandroidv1.utils.UserSession
 import com.example.quizletappandroidv1.viewmodel.user.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -121,7 +121,7 @@ class SignIn : Fragment(), View.OnFocusChangeListener {
         }
 
         binding.txtTermsOfService.setOnClickListener {
-            val intent = Intent(requireContext(), ActivityAdminDashboard::class.java)
+            val intent = Intent(requireContext(), ActivityAdmin::class.java)
             Log.d("Admin","Vaooo")
             startActivity(intent)
         }

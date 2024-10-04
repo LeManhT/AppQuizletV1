@@ -49,10 +49,11 @@ class FolderFragment : Fragment() {
                 if (it.documents.folders.isEmpty()) {
                     binding.rvFolderFragment.visibility = View.GONE
                     binding.layoutNoData.visibility = View.VISIBLE
+                } else {
+                    binding.rvFolderFragment.visibility = View.VISIBLE
+                    binding.layoutNoData.visibility = View.GONE
                 }
-
                 adapterFolder.updateData(it.documents.folders)
-
             }.onFailure { }
         }
         // Access the RecyclerView through the binding

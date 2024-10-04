@@ -80,6 +80,22 @@
             android:background="@drawable/button_splash"
             android:text="@string/or_log_in"
             android:textColor="@color/txt_white_in_btn" />
+
+        <TextView
+            android:id="@+id/txtLoginAdmin"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/mar_30"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:text="@string/if_you_want_sign_in_with_admin_account_please_click_here"
+            android:textColor="@color/primary_text"
+            android:alpha="0.6"
+            android:clickable="true"
+            android:focusable="true"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
     </LinearLayout>
 
 

@@ -7,19 +7,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.quizletappandroidv1.R
-import com.example.quizletappandroidv1.adapter.SolutionImageAdapter
+import com.example.quizletappandroidv1.adapter.StoryAdapter
 import com.example.quizletappandroidv1.databinding.FragmentSolutionListBinding
+import com.example.quizletappandroidv1.models.Story
+import com.example.quizletappandroidv1.utils.Helper
 
 class SolutionListFragment : Fragment() {
     private lateinit var binding: FragmentSolutionListBinding
-
-    private val imageResources = listOf(
-        R.raw.ac101,
-        R.raw.many_onj,
-        R.raw.ac104
-    )
-
+    private lateinit var storyAdapter: StoryAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,22 +27,17 @@ class SolutionListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Set up RecyclerView
-        val imageAdapter = SolutionImageAdapter() { imageResource ->
-            // Navigate to the image details when an image is clicked
-            val action =
-                SolutionListFragmentDirections.actionSolutionListFragmentToFragmentSolution(imageResource)
-            findNavController().navigate(action)
-        }
+        val stories = Helper.getStories(requireContext())
+        storyAdapter = StoryAdapter(stories,object : StoryAdapter.IStoryClick {
+            override fun handleStoryClick(story: Story) {
+                val action = SolutionListFragmentDirections.actionSolutionListFragmentToFragmentSolution(story)
+                findNavController().navigate(action)
+            }
+        })
 
-        binding.rvListSolutionImages.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = imageAdapter
-        }
-
-        imageAdapter.updateData(imageResources)
+        binding.rvListSolutionImages.adapter = storyAdapter
+        binding.rvListSolutionImages.layoutManager = LinearLayoutManager(context)
 
     }
-
 
 }

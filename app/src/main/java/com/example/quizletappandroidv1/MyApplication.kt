@@ -3,6 +3,7 @@ package com.example.quizletappandroidv1
 import android.app.Application
 import android.content.Context
 import com.airbnb.lottie.BuildConfig
+import com.example.quizletappandroidv1.repository.quote.QuoteRepository
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
@@ -19,10 +20,5 @@ class MyApplication : Application() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
-        // Optionally, set up a custom tree for release builds
-//        else {
-//            Timber.plant(ReleaseTree())
-//        }
-
     }
 }

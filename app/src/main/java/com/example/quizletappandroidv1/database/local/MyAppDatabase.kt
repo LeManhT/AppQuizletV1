@@ -4,21 +4,23 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.RoomDatabase.Callback
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.quizletappandroidv1.dao.FavouriteDao
 import com.example.quizletappandroidv1.dao.QuoteDao
 import com.example.quizletappandroidv1.entity.QuoteEntity
+import com.example.quizletappandroidv1.models.NewWord
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [QuoteEntity::class],
+    entities = [QuoteEntity::class, NewWord::class],
     version = 1,
     exportSchema = true
 )
 abstract class MyAppDatabase : RoomDatabase() {
     abstract fun quoteDao(): QuoteDao
+    abstract fun favouriteNewWordDao(): FavouriteDao
 
     companion object {
         @Volatile
