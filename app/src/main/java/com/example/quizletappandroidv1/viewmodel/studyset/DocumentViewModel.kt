@@ -63,25 +63,11 @@ class DocumentViewModel @Inject constructor(private val documentRepository: Docu
     private val _addSetToManyFoldersResponse = MutableLiveData<UserResponse>()
     val addSetToManyFoldersResponse: LiveData<UserResponse> get() = _addSetToManyFoldersResponse
 
+    private val _deleteSetResponse = MutableLiveData<UserResponse>()
+    val deleteSetResponse: LiveData<UserResponse> get() = _addSetToManyFoldersResponse
+
     private val _isPublic = MutableLiveData<Boolean>()
     val isPublic: LiveData<Boolean> = _isPublic
-
-
-    private val _isFrontSide = MutableLiveData<Boolean>().apply { value = true }  // Default to front side
-    val isFrontSide: LiveData<Boolean> get() = _isFrontSide
-
-    // Toggle front/back
-    fun toggleFlashcardSide() {
-        _isFrontSide.value = _isFrontSide.value?.not()
-    }
-
-    fun loadStudySets(userId: String) {
-        viewModelScope.launch {
-// val sets = studySetRepository.getAllStudySets(userId)
-// _studySets.postValue(sets)
-        }
-    }
-
 
     fun updatePublicStatus(isPublic: Boolean) {
         _isPublic.value = isPublic
@@ -90,7 +76,18 @@ class DocumentViewModel @Inject constructor(private val documentRepository: Docu
     fun deleteStudySet(setId: String, userId: String) {
         viewModelScope.launch {
             try {
-                documentRepository.deleteStudySet(userId, setId)
+                val result = documentRepository.deleteStudySet(userId, setId)
+                result.fold(
+                    onSuccess = {
+                        _deleteSetResponse.value = it
+                        Log.d("DeleteStudySet", "Delete success")
+                    },
+                    onFailure = {
+                        Timber.tag("Error study set").d(it.message.toString())
+                        Log.d("DeleteStudySet", "Delete failed ${it.message}")
+                    }
+                )
+
             } catch (e: Exception) {
                 Timber.tag("Error study set").d(e.message.toString())
             }
@@ -103,7 +100,7 @@ class DocumentViewModel @Inject constructor(private val documentRepository: Docu
             try {
                 val result = documentRepository.createNewFolder(userId, body)
                 result.fold(
-                    onSuccess = { _folderResponse.postValue(it) },
+                    onSuccess = { _folderResponse.value = it },
                     onFailure = { Timber.e(it, "Error creating folder") }
                 )
             } catch (e: Exception) {
@@ -242,12 +239,16 @@ class DocumentViewModel @Inject constructor(private val documentRepository: Docu
     fun enablePublicSet(userId: String, setId: String) {
         viewModelScope.launch {
             documentRepository.enablePublicSet(userId, setId)
+            _isPublic.value = true
+            operationResult.postValue(Result(true))
         }
     }
 
     fun disablePublicSet(userId: String, setId: String) {
         viewModelScope.launch {
             documentRepository.disablePublicSet(userId, setId)
+            _isPublic.value = false
+            operationResult.postValue(Result(false))
         }
     }
 
@@ -281,4 +282,8 @@ class DocumentViewModel @Inject constructor(private val documentRepository: Docu
         }
     }
 
+    val operationResult: MutableLiveData<Result> = MutableLiveData()
+
 }
+
+data class Result(val isSuccessful: Boolean, val errorMessage: String? = null)

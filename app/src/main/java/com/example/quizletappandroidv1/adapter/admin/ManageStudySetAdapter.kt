@@ -5,15 +5,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.models.StudySetModel
 
 class ManageStudySetAdapter(
     private val onAdminStudySetClick: IAdminStudySetClick,
-) : RecyclerView.Adapter<ManageStudySetAdapter.StudySetViewHolder>() {
-
-    private val studySetList: List<StudySetModel> = mutableListOf()
+) : PagingDataAdapter<StudySetModel, ManageStudySetAdapter.StudySetViewHolder>(STUDY_SET_COMPARATOR) {
 
     interface IAdminStudySetClick {
         fun handleEditClick(studySet: StudySetModel)
@@ -23,6 +23,7 @@ class ManageStudySetAdapter(
     class StudySetViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val studySetName: TextView = itemView.findViewById(R.id.txtStudySetName)
         val studySetDescription: TextView = itemView.findViewById(R.id.txtStudySetDescription)
+        val studySetNameOwner: TextView = itemView.findViewById(R.id.txtStudySetNameOwner)
         val btnEditStudySet: Button = itemView.findViewById(R.id.btnEditStudySet)
         val btnDeleteStudySet: Button = itemView.findViewById(R.id.btnDeleteStudySet)
     }
@@ -34,20 +35,35 @@ class ManageStudySetAdapter(
     }
 
     override fun onBindViewHolder(holder: StudySetViewHolder, position: Int) {
-        val studySet = studySetList[position]
-        holder.studySetName.text = studySet.name
-        holder.studySetDescription.text = studySet.description
+        val studySet = getItem(position) // Use getItem() to retrieve the current study set
 
-        holder.btnEditStudySet.setOnClickListener {
-            onAdminStudySetClick.handleEditClick(studySet)
-        }
+        if (studySet != null) {
+            holder.studySetName.text = studySet.name
+            holder.studySetDescription.text = studySet.description
+            holder.studySetNameOwner.text = studySet.nameOwner
 
-        holder.btnDeleteStudySet.setOnClickListener {
-            onAdminStudySetClick.handleDeleteClick(studySet)
+            holder.btnEditStudySet.setOnClickListener {
+                onAdminStudySetClick.handleEditClick(studySet)
+            }
+
+            holder.btnDeleteStudySet.setOnClickListener {
+                onAdminStudySetClick.handleDeleteClick(studySet)
+            }
         }
     }
 
-    override fun getItemCount(): Int {
-        return studySetList.size
+    companion object {
+        private val STUDY_SET_COMPARATOR = object : DiffUtil.ItemCallback<StudySetModel>() {
+            override fun areItemsTheSame(oldItem: StudySetModel, newItem: StudySetModel): Boolean {
+                return oldItem.id == newItem.id
+            }
+
+            override fun areContentsTheSame(
+                oldItem: StudySetModel,
+                newItem: StudySetModel
+            ): Boolean {
+                return oldItem == newItem
+            }
+        }
     }
 }

@@ -179,13 +179,17 @@ class StartAppFragment : Fragment() {
             findNavController().navigate(R.id.action_startAppFragment_to_signUp2)
         }
 
+
+        binding.imgSplashSearch.setOnClickListener {
+            findNavController().navigate(R.id.action_startAppFragment_to_fragmentSearch2)
+        }
+
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
+    ): View {
         binding = FragmentStartAppBinding.inflate(inflater, container, false)
         return binding.root
     }

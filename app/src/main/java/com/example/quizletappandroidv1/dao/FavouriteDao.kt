@@ -14,4 +14,9 @@ interface FavouriteDao {
 
     @Query("SELECT * FROM favourite_words")
     fun getAllFavouriteWords(): LiveData<List<NewWord>>
+
+    @Query("DELETE FROM favourite_words WHERE id = :id")
+    suspend fun deleteFavouriteWord(id: Int)
+
+
 }

@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatActivity.RECEIVER_NOT_EXPORTED
 import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -73,7 +74,7 @@ class StudySetDetail : Fragment(), TextToSpeech.OnInitListener,
     private var nameSet: String = ""
     private var currentPoint: Int = 0
 
-    private val documentViewModel: DocumentViewModel by viewModels()
+    private val documentViewModel: DocumentViewModel by activityViewModels()
     private val userViewModel: UserViewModel by viewModels()
 
     private val args: StudySetDetailArgs by navArgs()
@@ -117,6 +118,7 @@ class StudySetDetail : Fragment(), TextToSpeech.OnInitListener,
         (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(
             true
         )
+
         MyApplication.userId?.let { userViewModel.getUserData(it) }
 
         adapterStudySet = StudySetItemAdapter(object : RvFlashCard {
@@ -256,6 +258,7 @@ class StudySetDetail : Fragment(), TextToSpeech.OnInitListener,
 
                     val paragraph = document.createParagraph()
                     val run = paragraph.createRun()
+                    Log.d("saveDocx", content)
                     run.setText(content)
                 }
 
@@ -340,6 +343,8 @@ class StudySetDetail : Fragment(), TextToSpeech.OnInitListener,
 
                     termCell.setCellValue(flashCard.term)
                     definitionCell.setCellValue(flashCard.definition)
+
+                    Log.d("saveExcell", "${termCell} cachs ${definitionCell}")
                 }
 
                 // Specify the directory and filename for saving the Excel file
@@ -469,14 +474,17 @@ class StudySetDetail : Fragment(), TextToSpeech.OnInitListener,
             }
 
             R.id.option_public -> {
-                Log.d("isPu", isPublic.toString())
-                if (isPublic == true) {
-                    disablePublicSet(Helper.getDataUserId(requireContext()), args.setId)
-                    item.title = resources.getString(R.string.public_set)
-                } else {
-                    enablePublicSet(Helper.getDataUserId(requireContext()), args.setId)
-                    item.title = resources.getString(R.string.disable_public_set)
+                documentViewModel.isPublic.observe(viewLifecycleOwner) {
+                    Log.d("isPublic", isPublic.toString())
+                    if (isPublic == true) {
+                        disablePublicSet(Helper.getDataUserId(requireContext()), args.setId)
+                        item.title = resources.getString(R.string.public_set)
+                    } else {
+                        enablePublicSet(Helper.getDataUserId(requireContext()), args.setId)
+                        item.title = resources.getString(R.string.disable_public_set)
+                    }
                 }
+
             }
 
             R.id.option_delete -> {
@@ -487,26 +495,22 @@ class StudySetDetail : Fragment(), TextToSpeech.OnInitListener,
     }
 
     private fun enablePublicSet(userId: String, setId: String) {
-            showLoading(resources.getString(R.string.publishing_set))
+//        showLoading(R.string.loading_data.toString())
         documentViewModel.enablePublicSet(userId, setId)
     }
 
     private fun disablePublicSet(userId: String, setId: String) {
+//        showLoading(R.string.loading_data.toString())
         documentViewModel.disablePublicSet(userId, setId)
+//        documentViewModel.operationResult.observe(viewLifecycleOwner) { result ->
+//            progressDialog.dismiss()
+//            if (result.isSuccessful) {
+//                progressDialog.dismiss()
+//            } else {
+//                Toast.makeText(requireContext(), result.errorMessage, Toast.LENGTH_SHORT).show()
+//            }
+//        }
     }
-
-    //
-    //    private fun showDialogBottomSheet() {
-    //        val addBottomSheet = FragmentSortTerm()
-    //        addBottomSheet.sortTermListener = requireContext()
-    //
-    //        if (!addBottomSheet.isAdded) {
-    //            val transaction = supportFragmentManager.beginTransaction()
-    //            transaction.add(addBottomSheet, FragmentSortTerm.TAG)
-    //            transaction.commitAllowingStateLoss()
-    //        }
-    //    }
-
 
     private fun shareDialog(userId: String, setId: String) {
         val deepLinkBaseUrl = "www.ttcs_quizlet.com/studyset"

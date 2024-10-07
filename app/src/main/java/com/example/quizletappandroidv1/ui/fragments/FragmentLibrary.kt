@@ -10,6 +10,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
@@ -20,12 +21,14 @@ import com.example.quizletappandroidv1.databinding.FragmentLibraryBinding
 import com.example.quizletappandroidv1.viewmodel.studyset.DocumentViewModel
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.gson.JsonObject
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FragmentLibrary : Fragment() {
     private lateinit var binding: FragmentLibraryBinding
     private lateinit var navController: NavController
     private lateinit var adapter: ViewPagerLibAdapter
-    private val documentViewModel: DocumentViewModel by viewModels()
+    private val documentViewModel: DocumentViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

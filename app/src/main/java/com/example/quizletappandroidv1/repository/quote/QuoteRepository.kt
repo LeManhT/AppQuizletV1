@@ -10,6 +10,7 @@ import com.example.quizletappandroidv1.database.local.MyAppDatabase
 import com.example.quizletappandroidv1.entity.QuoteEntity
 import com.example.quizletappandroidv1.models.QuoteResponse
 import com.google.gson.Gson
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -29,11 +30,11 @@ class QuoteRepository @Inject constructor(
         get() = quoteLocalLiveData
 
     suspend fun getQuotes(page: Int) {
+        Log.d("dataQuote12", "vào hàm getQuotes")
         if (NetworkUtil.isInternetAvailable(context)) {
             val result = quoteService.getQuoteFromServer(page)
             Log.d("dataQuote12", Gson().toJson(result.body()))
             if (result.body() != null) {
-//                quoteDb.quoteDao().insertManyQuotes(result.body()!!.results)
                 quoteRemoteLiveData.postValue(result.body())
             }
         } else {
@@ -51,6 +52,7 @@ class QuoteRepository @Inject constructor(
         quoteDb.quoteDao().deleteQuote(quoteId)
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun getLocalQuotes(userId: String) {
         val localQuote = quoteDb.quoteDao().getLocalQuotes(userId)
         GlobalScope.launch(Dispatchers.Main) {

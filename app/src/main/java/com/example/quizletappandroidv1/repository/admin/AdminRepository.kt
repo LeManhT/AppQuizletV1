@@ -1,5 +1,7 @@
 package com.example.quizletappandroidv1.repository.admin
 
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import com.example.quizletappandroidv1.database.api.retrofit.ApiService
 import com.example.quizletappandroidv1.entity.UserResponse
 import com.example.quizletappandroidv1.models.admin.UserAdmin
@@ -8,17 +10,32 @@ import javax.inject.Inject
 
 class AdminRepository @Inject constructor(private val apiService: ApiService) {
 
-    suspend fun getListUserAdmin(from: Int, to: Int): Result<List<UserResponse>> {
-        return try {
-            val response = apiService.getListUserAdmin(from, to)
-            if (response.isSuccessful) {
-                Result.success(response.body()!!)
-            } else {
-                Result.failure(Exception("Failed to load users"))
+    fun getPagingUsers(): PagingSource<Int, UserResponse> {
+        return object : PagingSource<Int, UserResponse>() {
+            override suspend fun load(params: LoadParams<Int>): LoadResult<Int, UserResponse> {
+                val position = params.key ?: 0
+                val pageSize = params.loadSize
+
+                return try {
+                    val response = apiService.getListUserAdmin(position, position + pageSize)
+                    if (response.isSuccessful) {
+                        val users = response.body()!!
+                        LoadResult.Page(
+                            data = users,
+                            prevKey = if (position == 0) null else position - pageSize,
+                            nextKey = if (users.isEmpty()) null else position + pageSize
+                        )
+                    } else {
+                        LoadResult.Error(Exception("Failed to load users"))
+                    }
+                } catch (e: Exception) {
+                    LoadResult.Error(e)
+                }
             }
-        } catch (e: Exception) {
-            Timber.e(e, "Unexpected exception occurred while logging in user")
-            Result.failure(e)
+
+            override fun getRefreshKey(state: PagingState<Int, UserResponse>): Int? {
+                return state.anchorPosition
+            }
         }
     }
 

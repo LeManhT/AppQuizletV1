@@ -39,7 +39,6 @@ class DocumentRepository @Inject constructor(val apiService: ApiService) {
                 }
             } else {
                 val errorMessage = response.errorBody()?.string() ?: "Unknown error"
-                Timber.e("Get User Ranking error: $errorMessage")
                 Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {

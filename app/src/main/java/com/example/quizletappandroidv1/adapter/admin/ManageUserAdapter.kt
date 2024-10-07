@@ -6,17 +6,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.entity.UserResponse
 
 class ManageUserAdapter(
     private val onUserAdminClick: IUserAdminClick
-) : RecyclerView.Adapter<ManageUserAdapter.UserViewHolder>() {
-    private var userList: List<UserResponse> = mutableListOf()
+) : PagingDataAdapter<UserResponse, ManageUserAdapter.UserViewHolder>(USER_COMPARATOR) {
+
     interface IUserAdminClick {
         fun handleEditClick(user: UserResponse)
         fun handleDeleteClick(user: UserResponse)
+        fun handleSuspendClick(user: UserResponse)
+        fun handleUnsuspendClick(user: UserResponse)
     }
 
     class UserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -24,6 +28,8 @@ class ManageUserAdapter(
         val userEmail: TextView = itemView.findViewById(R.id.txtUserEmail)
         val btnEdit: Button = itemView.findViewById(R.id.btnEdit)
         val btnDelete: Button = itemView.findViewById(R.id.btnDelete)
+        val btnSuspend: Button = itemView.findViewById(R.id.btnSuspend)
+        val btnUnsuspend: Button = itemView.findViewById(R.id.btnDeSuspend)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
@@ -33,9 +39,22 @@ class ManageUserAdapter(
     }
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-        val user = userList[position]
+        val user = getItem(position) ?: return
+
         holder.userName.text = user.userName
         holder.userEmail.text = user.email
+
+        if (user.isSuspend) {
+            holder.btnSuspend.visibility = View.GONE
+            holder.btnUnsuspend.visibility = View.VISIBLE
+        } else {
+            holder.btnSuspend.visibility = View.VISIBLE
+            holder.btnUnsuspend.visibility = View.GONE
+        }
+
+        holder.btnUnsuspend.setOnClickListener {
+            onUserAdminClick.handleUnsuspendClick(user)
+        }
 
         holder.btnEdit.setOnClickListener {
             onUserAdminClick.handleEditClick(user)
@@ -44,16 +63,21 @@ class ManageUserAdapter(
         holder.btnDelete.setOnClickListener {
             onUserAdminClick.handleDeleteClick(user)
         }
+
+        holder.btnSuspend.setOnClickListener {
+            onUserAdminClick.handleSuspendClick(user)
+        }
     }
 
-    override fun getItemCount(): Int {
-        return userList.size
-    }
+    companion object {
+        private val USER_COMPARATOR = object : DiffUtil.ItemCallback<UserResponse>() {
+            override fun areItemsTheSame(oldItem: UserResponse, newItem: UserResponse): Boolean {
+                return oldItem.id == newItem.id
+            }
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun updateData(newList: List<UserResponse>) {
-        this.userList = newList
-        notifyDataSetChanged()
+            override fun areContentsTheSame(oldItem: UserResponse, newItem: UserResponse): Boolean {
+                return oldItem == newItem
+            }
+        }
     }
-
 }

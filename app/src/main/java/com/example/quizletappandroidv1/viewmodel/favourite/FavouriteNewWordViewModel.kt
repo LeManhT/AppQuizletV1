@@ -30,5 +30,11 @@ class FavouriteNewWordViewModel @Inject constructor(private val favouriteNewWord
             editStatusLiveData.postValue(id)
         }
     }
+    fun deleteFavouriteWord(word : NewWord) {
+        viewModelScope.launch {
+            favouriteNewWordRepository.deleteFavouriteWord(word)
+        }
+
+    }
 
 }

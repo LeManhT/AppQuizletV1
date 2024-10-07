@@ -25,28 +25,27 @@ import com.example.quizletappandroidv1.models.ModelLanguage
 import com.example.quizletappandroidv1.models.NewWord
 import com.example.quizletappandroidv1.models.Story
 import com.example.quizletappandroidv1.viewmodel.favourite.FavouriteNewWordViewModel
+import com.google.android.material.snackbar.Snackbar
 import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.Translator
 import com.google.mlkit.nl.translate.TranslatorOptions
+import dagger.hilt.android.AndroidEntryPoint
 import java.lang.ref.WeakReference
 import java.util.Locale
 
-
+@AndroidEntryPoint
 class FragmentSolution : Fragment() {
     private lateinit var binding: FragmentSolutionBinding
     private val args: FragmentSolutionArgs by navArgs()
     private lateinit var newWordAdapter: NewWordAdapter
-
     private var targetLanguage: String = "vi"
     private var targetTitle: String = "Vietnamese"
     private val listLanguages = arrayListOf<ModelLanguage>()
     private var dualLanguageTranslator: Translator? = null
     private lateinit var progressDialog: ProgressDialog
-
     private val favouriteViewModel: FavouriteNewWordViewModel by viewModels()
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -59,13 +58,11 @@ class FragmentSolution : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         displayStoryContent(args.story)
         loadAvailableLanguage()
-
     }
 
     private fun displayStoryContent(story: Story) {
         val spannableString = SpannableString(story.content)
 
-        // Thêm clickable span cho từng từ mới
         story.newWords.forEach { newWord ->
             val startIndex = story.content.indexOf(newWord.word)
             if (startIndex >= 0) {
@@ -101,6 +98,20 @@ class FragmentSolution : Fragment() {
 
             override fun handleAddToFavourite(newWord: NewWord) {
                 favouriteViewModel.addFavouriteWord(newWord.word, newWord.meaning)
+            }
+
+            override fun showSnackbar(message: String) {
+                view?.let {
+                    Snackbar.make(
+                        it.findViewById(R.id.btnAddToFavourite),
+                        message,
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            override fun deleteFavourite(newWord: NewWord) {
+                favouriteViewModel.deleteFavouriteWord(newWord)
             }
         })
         newWordAdapter.updateData(story.newWords)

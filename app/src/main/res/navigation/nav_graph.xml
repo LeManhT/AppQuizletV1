@@ -31,6 +31,9 @@
         <action
             android:id="@+id/action_fragmentLibrary2_to_createSet"
             app:destination="@id/createSet" />
+        <action
+            android:id="@+id/action_fragmentLibrary2_to_studySetDetail2"
+            app:destination="@id/studySetDetail" />
 
 
     </fragment>
@@ -111,6 +114,9 @@
         <action
             android:id="@+id/action_rankLeaderBoard_to_fragmentHome3"
             app:destination="@id/fragmentHome3" />
+        <action
+            android:id="@+id/action_rankLeaderBoard_to_itemRankDetail"
+            app:destination="@id/itemRankDetail" />
     </fragment>
     <fragment
         android:id="@+id/achievements"
@@ -201,6 +207,9 @@
         <action
             android:id="@+id/action_folderDetail_to_fragmentFolders"
             app:destination="@id/fragmentFolders" />
+        <action
+            android:id="@+id/action_folderDetail_to_addSetToFolder"
+            app:destination="@id/addSetToFolder" />
     </fragment>
     <fragment
         android:id="@+id/fragmentMyQuote"
@@ -251,6 +260,9 @@
         <action
             android:id="@+id/action_solutionListFragment_to_fragmentSolution"
             app:destination="@id/fragmentSolution" />
+        <action
+            android:id="@+id/action_solutionListFragment_to_fragmentFavouriteWord"
+            app:destination="@id/fragmentFavouriteWord" />
     </fragment>
     <fragment
         android:id="@+id/viewImage"
@@ -259,6 +271,9 @@
         <action
             android:id="@+id/action_viewImage_to_profile"
             app:destination="@id/profile" />
+        <action
+            android:id="@+id/action_viewImage_to_itemRankDetail"
+            app:destination="@id/itemRankDetail" />
     </fragment>
     <fragment
         android:id="@+id/settings"
@@ -343,6 +358,9 @@
         <action
             android:id="@+id/action_studySetDetail_to_fragmentLibrary2"
             app:destination="@id/fragmentLibrary2" />
+        <action
+            android:id="@+id/action_studySetDetail_to_fragmentLibrary22"
+            app:destination="@id/fragmentLibrary2" />
     </fragment>
     <fragment
         android:id="@+id/fragmentWelcomeToLearn"
@@ -368,6 +386,9 @@
         <argument
             android:name="setId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_reviewLearn_to_excellent2"
+            app:destination="@id/excellent2" />
 
     </fragment>
     <fragment
@@ -414,6 +435,13 @@
             app:destination="@id/studySetDetail" />
         <argument
             android:name="setId"
+            android:defaultValue=""
+            app:argType="string" />
+        <action
+            android:id="@+id/action_addSetToFolder_to_folderDetail"
+            app:destination="@id/folderDetail" />
+        <argument
+            android:name="folderId"
             app:argType="string" />
     </fragment>
     <dialog
@@ -434,6 +462,21 @@
         <action
             android:id="@+id/action_excellent2_to_fragmentLibrary2"
             app:destination="@id/fragmentLibrary2" />
+        <argument
+            android:name="listCardTest"
+            app:argType="string" />
+        <argument
+            android:name="countTrue"
+            app:argType="integer" />
+        <argument
+            android:name="countFalse"
+            app:argType="integer" />
+        <argument
+            android:name="listSize"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_excellent2_to_reviewLearn"
+            app:destination="@id/reviewLearn" />
     </fragment>
 
     <fragment
@@ -479,5 +522,28 @@
         <action
             android:id="@+id/action_createQuote_to_fragmentMyQuote"
             app:destination="@id/fragmentMyQuote" />
+    </fragment>
+    <dialog
+        android:id="@+id/itemRankDetail"
+        android:name="com.example.quizletappandroidv1.ui.fragments.ItemRankDetail"
+        android:label="ItemRankDetail">
+        <action
+            android:id="@+id/action_itemRankDetail_to_rankLeaderBoard"
+            app:destination="@id/rankLeaderBoard" />
+        <argument
+            android:name="rankItem"
+            app:argType="com.example.quizletappandroidv1.models.RankItemModel" />
+        <action
+            android:id="@+id/action_itemRankDetail_to_viewImage"
+            app:destination="@id/viewImage" />
+    </dialog>
+    <fragment
+        android:id="@+id/fragmentFavouriteWord"
+        android:name="com.example.quizletappandroidv1.ui.fragments.FragmentFavouriteWord"
+        android:label="fragment_favourite_word"
+        tools:layout="@layout/fragment_favourite_word">
+        <action
+            android:id="@+id/action_fragmentFavouriteWord_to_solutionListFragment"
+            app:destination="@id/solutionListFragment" />
     </fragment>
 </navigation>

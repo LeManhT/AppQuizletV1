@@ -40,12 +40,7 @@ class AdapterSearchSet(fragment: FragmentManager, lifecycle: Lifecycle) :
         }
     }
 
-//    fun updateSetsData(query: String) {
-//        setsFragment.updateData(query)
-//    }
-//
-//    // Phương thức để cập nhật dữ liệu cho tab user khi tìm kiếm
-//    fun updateUserData(query: String) {
-//        userFragment.updateData(query)
-//    }
+    fun updateAllResultsData(query: String) {
+        allResultsFragment.updateData(query)
+    }
 }

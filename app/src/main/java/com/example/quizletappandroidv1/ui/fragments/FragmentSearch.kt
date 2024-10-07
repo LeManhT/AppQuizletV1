@@ -7,13 +7,20 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.adapter.AdapterSearchSet
 import com.example.quizletappandroidv1.databinding.FragmentSearchBinding
+import com.example.quizletappandroidv1.viewmodel.studyset.DocumentViewModel
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FragmentSearch : Fragment() {
     private lateinit var binding: FragmentSearchBinding
+    private val documentViewModel: DocumentViewModel by viewModels()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -55,19 +62,14 @@ class FragmentSearch : Fragment() {
             }
         }.attach()
 
-
-
-
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (!query.isNullOrBlank()) {
-//                    findSetByKeyword(query)
+                    documentViewModel.findStudySet(query)
+                    adapterLibPager.updateAllResultsData(query)
+                    findNavController().navigate(R.id.action_fragmentSearch2_to_fragmentAllResult)
                 }
-                binding.searchView.clearFocus();
-//                query?.let {
-//                    adapterLibPager.updateSetsData(it)
-//                    adapterLibPager.updateUserData(it)
-//                }
+                binding.searchView.clearFocus()
                 return true
             }
 
@@ -76,6 +78,8 @@ class FragmentSearch : Fragment() {
             }
         })
 
+
     }
+
 
 }

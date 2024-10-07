@@ -3,8 +3,10 @@ package com.example.quizletappandroidv1.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.models.Story
 
@@ -20,10 +22,14 @@ class StoryAdapter(
     inner class StoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val tvTitleStory: TextView = itemView.findViewById(R.id.txtTitleStory)
         private val tvContentStory: TextView = itemView.findViewById(R.id.txtContentStory)
+        private val imgNotification: ImageView = itemView.findViewById(R.id.imgNotification)
 
         fun bind(story: Story) {
             tvTitleStory.text = story.title
             tvContentStory.text = story.content
+            Glide.with(itemView.context)
+                .load(story.imagePath)
+                .into(imgNotification)
             itemView.setOnClickListener { onStoryClick?.handleStoryClick(story) }
         }
     }

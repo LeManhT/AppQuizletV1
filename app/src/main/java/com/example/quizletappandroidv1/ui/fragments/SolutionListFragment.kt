@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.adapter.StoryAdapter
 import com.example.quizletappandroidv1.databinding.FragmentSolutionListBinding
 import com.example.quizletappandroidv1.models.Story
@@ -37,6 +38,11 @@ class SolutionListFragment : Fragment() {
 
         binding.rvListSolutionImages.adapter = storyAdapter
         binding.rvListSolutionImages.layoutManager = LinearLayoutManager(context)
+
+        binding.txtFavouriteWord.setOnClickListener {
+            findNavController().navigate(R.id.action_solutionListFragment_to_fragmentFavouriteWord)
+        }
+
 
     }
 

@@ -14,4 +14,9 @@ class FavouriteRepository @Inject constructor(private val favouriteDao: Favourit
     fun getAllFavouriteWords(): LiveData<List<NewWord>> {
         return favouriteDao.getAllFavouriteWords()
     }
+
+    suspend fun deleteFavouriteWord(favouriteWord: NewWord) {
+        favouriteDao.deleteFavouriteWord(favouriteWord.id)
+    }
+
 }

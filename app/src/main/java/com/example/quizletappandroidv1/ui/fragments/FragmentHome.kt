@@ -45,7 +45,6 @@ import com.example.quizletappandroidv1.viewmodel.studyset.DocumentViewModel
 import com.example.quizletappandroidv1.viewmodel.user.UserViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
@@ -233,6 +232,12 @@ class FragmentHome : Fragment() {
                     binding.noDataHomeSet.visibility = View.GONE
                     adapterHomeStudySet.updateData(userResponse.documents.studySets)
                 }
+                saveIdUser(
+                    userResponse.id,
+                    userResponse.userName,
+                    userResponse.loginPassword,
+                    true
+                )
             }.onFailure { exception ->
                 CustomToast(requireContext()).makeText(
                     requireContext(),
@@ -361,7 +366,6 @@ class FragmentHome : Fragment() {
                     day.format(DateTimeFormatter.ofPattern("d")) // Định dạng là số ngày (1, 2, 3, ...)
                 }
 
-
                 val dayAdapter = AdapterCustomDatePicker(formattedDays, formattedAchieveDays)
                 recyclerViewDay.addItemDecoration(EqualSpacingItemDecoration(5))
                 recyclerViewDay.layoutManager = LinearLayoutManager(
@@ -388,7 +392,11 @@ class FragmentHome : Fragment() {
                     adapterSearchSet =
                         SearchListAdapter(object : SearchListAdapter.ISearchSetClick {
                             override fun handleSearchSetClick(studyset: SearchSetModel) {
-
+                                val action =
+                                    FragmentHomeDirections.actionFragmentHome3ToStudySetDetail(
+                                        studyset.id
+                                    )
+                                findNavController().navigate(action)
                             }
                         })
 
@@ -428,6 +436,19 @@ class FragmentHome : Fragment() {
             }
         }
 
+//        binding.searchView.editText.setOnEditorActionListener { v, actionId, event ->
+//            if (actionId == EditorInfo.IME_ACTION_SEARCH || event?.keyCode == KeyEvent.KEYCODE_ENTER) {
+//                val action = FragmentHomeDirections.actionFragmentHome3ToSearchResultsFragment(
+//                    binding.searchView.editText.text.toString()
+//                )
+//                findNavController().navigate(action)
+//                true
+//            } else {
+//                false
+//            }
+//        }
+
+
         documentViewModel.studySetSearchResults.observe(viewLifecycleOwner) { filteredContacts ->
             if (filteredContacts.isEmpty()) {
                 binding.rvSearchStudySet.visibility = View.GONE
@@ -462,6 +483,23 @@ class FragmentHome : Fragment() {
     private fun saveCountStreak(streak: Int) {
         val editor = sharedPreferences.edit()
         editor.putInt("countStreak", streak)
+        editor.apply()
+    }
+
+
+    private fun saveIdUser(
+        userId: String,
+        userName: String,
+        password: String,
+        isLoggedIn: Boolean
+    ) {
+        sharedPreferences =
+            requireActivity().getSharedPreferences("idUser", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("key_userid", userId)
+        editor.putString("key_userPass", password)
+        editor.putString("key_username", userName)
+        editor.putBoolean("isLoggedIn", isLoggedIn)
         editor.apply()
     }
 

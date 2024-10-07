@@ -6,19 +6,29 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.adapter.admin.ManageUserAdapter
 import com.example.quizletappandroidv1.databinding.FragmentManageUserBinding
 import com.example.quizletappandroidv1.entity.UserResponse
 import com.example.quizletappandroidv1.viewmodel.admin.AdminViewModel
+import com.example.quizletappandroidv1.viewmodel.studyset.DocumentViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @AndroidEntryPoint
 class FragmentManageUser : Fragment() {
     private lateinit var binding: FragmentManageUserBinding
     private val adminViewModel: AdminViewModel by activityViewModels()
-
+    private val documentViewModel: DocumentViewModel by viewModels()
+    private lateinit var listUserAdapter: ManageUserAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,39 +41,84 @@ class FragmentManageUser : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val listUserAdapter = ManageUserAdapter(object : ManageUserAdapter.IUserAdminClick {
+        listUserAdapter = ManageUserAdapter(object : ManageUserAdapter.IUserAdminClick {
             override fun handleDeleteClick(user: UserResponse) {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(resources.getString(R.string.warning))
+                    .setMessage(resources.getString(R.string.confirm_suspend_user))
+                    .setNegativeButton(resources.getString(R.string.cancel)) { dialog, which ->
+                        dialog.dismiss()
+                    }
+                    .setPositiveButton(resources.getString(R.string.accept)) { dialog, which ->
 
+                    }
+                    .show()
             }
 
             override fun handleEditClick(user: UserResponse) {
+                val action = FragmentManageUserDirections.actionManageUserToFragmentEditUser(user)
+                findNavController().navigate(action)
+            }
 
+            override fun handleSuspendClick(user: UserResponse) {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(resources.getString(R.string.warning))
+                    .setMessage(resources.getString(R.string.confirm_suspend_user))
+                    .setNegativeButton(resources.getString(R.string.cancel)) { dialog, which ->
+                        dialog.dismiss()
+                    }
+                    .setPositiveButton(resources.getString(R.string.accept)) { dialog, which ->
+                        adminViewModel.suspendUser(user.id, true).also {
+                            user.isSuspend =
+                                true
+                            listUserAdapter.notifyDataSetChanged()
+                        }
+                    }
+                    .show()
+            }
+
+            override fun handleUnsuspendClick(user: UserResponse) {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(resources.getString(R.string.warning))
+                    .setMessage(resources.getString(R.string.confirm_unsuspend_user))
+                    .setNegativeButton(resources.getString(R.string.cancel)) { dialog, which ->
+                        dialog.dismiss()
+                    }
+                    .setPositiveButton(resources.getString(R.string.accept)) { dialog, which ->
+                        adminViewModel.suspendUser(user.id, false).also {
+                            user.isSuspend = false
+                            listUserAdapter.notifyDataSetChanged()
+                        }
+                    }
+                    .show()
             }
         })
 
-        adminViewModel.getListUserAdmin(0, 10)
+        lifecycleScope.launch {
+            adminViewModel.pagingUsers.collectLatest { pagingData: PagingData<UserResponse> ->
+//                listUserAdapter.updateData(pagingData)
+                listUserAdapter.submitData(pagingData)
+            }
+        }
 
         binding.recyclerViewUsers.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.recyclerViewUsers.adapter = listUserAdapter
 
         adminViewModel.allUser.observe(viewLifecycleOwner) { result ->
-            run {
-                result.onSuccess {
-                    if (it.isEmpty()) {
-                        binding.recyclerViewUsers.visibility = View.GONE
-                        binding.layoutNoData.visibility = View.VISIBLE
-                    } else {
-                        binding.recyclerViewUsers.visibility = View.VISIBLE
-                        binding.layoutNoData.visibility = View.GONE
-                    }
-                    listUserAdapter.updateData(it)
-                }.onFailure {
-                    Timber.log(1, it.message.toString())
+            result.onSuccess { userList ->
+                if (userList.isEmpty()) {
+                    binding.recyclerViewUsers.visibility = View.GONE
+                    binding.layoutNoData.visibility = View.VISIBLE
+                } else {
+                    binding.recyclerViewUsers.visibility = View.VISIBLE
+                    binding.layoutNoData.visibility = View.GONE
+                    listUserAdapter.submitData(lifecycle, PagingData.from(userList))
                 }
+            }.onFailure {
+                Timber.log(1, it.message.toString())
             }
         }
-
     }
 
 }

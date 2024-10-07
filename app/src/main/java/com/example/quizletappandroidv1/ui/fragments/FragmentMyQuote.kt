@@ -12,13 +12,14 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.quizletappandroidv1.MyApplication
 import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.adapter.QuoteLocalAdapter
+import com.example.quizletappandroidv1.adapter.QuoteLocalAdapter.OnQuotifyLocalListener
 import com.example.quizletappandroidv1.databinding.FragmentMyQuoteBinding
 import com.example.quizletappandroidv1.viewmodel.quote.QuoteViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MyQuoteFragment : Fragment(), QuoteLocalAdapter.OnQuotifyLocalListener {
+class FragmentMyQuote : Fragment() {
     private lateinit var quoteAdapter: QuoteLocalAdapter
     private lateinit var binding: FragmentMyQuoteBinding
     private val myViewModel: QuoteViewModel by viewModels()
@@ -36,8 +37,35 @@ class MyQuoteFragment : Fragment(), QuoteLocalAdapter.OnQuotifyLocalListener {
 
         MyApplication.userId?.let { myViewModel.getLocalQuotes(it) }
 
-        quoteAdapter = QuoteLocalAdapter(myViewModel, binding.rvQuote)
-        quoteAdapter.setOnQuoteShareListener(this)
+        quoteAdapter = QuoteLocalAdapter(binding.rvQuote, object : OnQuotifyLocalListener {
+            override fun handleShareQuote(position: Int) {
+                val quoteText = quoteAdapter.getQuoteText(position)
+                val sendIntent: Intent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, quoteText.joinToString("\n"))
+                    type = "text/plain"
+                }
+                startActivity(Intent.createChooser(sendIntent, null))
+            }
+
+            override fun handleDeleteQuote(quoteId: Long) {
+                MaterialAlertDialogBuilder(requireContext()).setTitle(resources.getString(R.string.warning))
+                    .setMessage(resources.getString(R.string.confirm_delete_quote))
+                    .setNeutralButton(resources.getString(R.string.cancel)) { dialog, _ ->
+                        dialog.dismiss()
+                    }.setPositiveButton(resources.getString(R.string.accept)) { _, _ ->
+                        myViewModel.deleteQuote(quoteId)
+                    }.show()
+            }
+
+            override fun handleNextQuote(position: Int) {
+                quoteAdapter.handleNextQuote(position)
+            }
+
+            override fun handlePrevQuote(position: Int) {
+                quoteAdapter.handlePrevQuote(position)
+            }
+        })
         binding.rvQuote.adapter = quoteAdapter
         binding.rvQuote.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
@@ -51,6 +79,7 @@ class MyQuoteFragment : Fragment(), QuoteLocalAdapter.OnQuotifyLocalListener {
             } else {
                 binding.rvQuote.visibility = View.VISIBLE
                 binding.layoutNoData.visibility = View.GONE
+                quoteAdapter.updateQuotes(it)
             }
             quoteAdapter.notifyDataSetChanged()
         }
@@ -65,23 +94,4 @@ class MyQuoteFragment : Fragment(), QuoteLocalAdapter.OnQuotifyLocalListener {
         }
     }
 
-    override fun handleShareQuote(position: Int) {
-        val quoteText = quoteAdapter.getQuoteText(position)
-        val sendIntent: Intent = Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, quoteText.joinToString("\n"))
-            type = "text/plain"
-        }
-        startActivity(Intent.createChooser(sendIntent, null))
-    }
-
-    override fun handleDeleteQuote(quoteId: Long) {
-        MaterialAlertDialogBuilder(requireContext()).setTitle(resources.getString(R.string.warning))
-            .setMessage(resources.getString(R.string.confirm_delete_quote))
-            .setNeutralButton(resources.getString(R.string.cancel)) { dialog, _ ->
-                dialog.dismiss()
-            }.setPositiveButton(resources.getString(R.string.accept)) { _, _ ->
-                myViewModel.deleteQuote(quoteId)
-            }.show()
-    }
 }

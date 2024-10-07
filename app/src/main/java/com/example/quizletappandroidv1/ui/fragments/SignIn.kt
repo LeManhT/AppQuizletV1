@@ -171,20 +171,5 @@ class SignIn : Fragment(), View.OnFocusChangeListener {
     }
 
 
-    private fun saveIdUser(
-        userId: String,
-        userName: String,
-        password: String,
-        isLoggedIn: Boolean
-    ) {
-        sharedPreferences =
-            requireActivity().getSharedPreferences("idUser", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putString("key_userid", userId)
-        editor.putString("key_userPass", password)
-        editor.putString("key_username", userName)
-        editor.putBoolean("isLoggedIn", isLoggedIn)
-        editor.apply()
-    }
 
 }

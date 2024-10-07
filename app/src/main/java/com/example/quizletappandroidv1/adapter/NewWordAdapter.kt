@@ -12,12 +12,13 @@ import com.example.quizletappandroidv1.models.NewWord
 class NewWordAdapter(
     private val onTranslateClicked: INewWordClick? = null
 ) : RecyclerView.Adapter<NewWordAdapter.NewWordViewHolder>() {
-
     private var newWords: List<NewWord> = mutableListOf()
 
     interface INewWordClick {
         fun handleTranslateClick(newWord: NewWord, position: Int, view: View)
         fun handleAddToFavourite(newWord: NewWord)
+        fun showSnackbar(message: String)
+        fun deleteFavourite(newWord: NewWord) // New method for deleting favorite
     }
 
     inner class NewWordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -44,8 +45,31 @@ class NewWordAdapter(
             onTranslateClicked?.handleTranslateClick(newWord, position, view)
         }
 
+        // Set the icon based on the favorite status
+        val favoriteIcon = if (newWord.isFavourite) {
+            R.drawable.favourite // Replace with your active favorite icon
+        } else {
+            R.drawable.favourite_off // Replace with your inactive favorite icon
+        }
+        holder.btnAddToFavourite.setImageResource(favoriteIcon)
+
+        // Handle favorite button click
         holder.btnAddToFavourite.setOnClickListener {
-            onTranslateClicked?.handleAddToFavourite(newWord)
+            // Toggle the favorite status
+            newWord.isFavourite = !newWord.isFavourite
+
+            if (newWord.isFavourite) {
+                onTranslateClicked?.handleAddToFavourite(newWord)
+            } else {
+                onTranslateClicked?.deleteFavourite(newWord)
+            }
+            val message = if (newWord.isFavourite) {
+                holder.itemView.context.getString(R.string.added_to_favorites)
+            } else {
+                holder.itemView.context.getString(R.string.removed_from_favorites)
+            }
+            onTranslateClicked?.showSnackbar(message)
+            notifyItemChanged(position)
         }
 
     }

@@ -12,6 +12,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.quizletappandroidv1.MyApplication
@@ -26,7 +27,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class Add : BottomSheetDialogFragment() {
     private lateinit var binding: FragmentAddBinding
     private lateinit var progressDialog: ProgressDialog
-    private val documentViewModel: DocumentViewModel by viewModels()
+    private val documentViewModel: DocumentViewModel by activityViewModels()
 
     override
     fun onCreateView(

@@ -1,21 +1,23 @@
 package com.example.quizletappandroidv1.adapter
 
 import android.content.Context
-import android.content.Intent
-import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatButton
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.custom.CustomToast
 import com.example.quizletappandroidv1.databinding.LayoutQuestionReviewBinding
 import com.example.quizletappandroidv1.models.FlashCardModel
-import com.example.quizletappandroidv1.ui.fragments.Excellent
+import com.example.quizletappandroidv1.ui.fragments.ReviewLearnDirections
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 
@@ -35,7 +37,9 @@ class ReviewLearnAdapter(
 
 
     inner class ReviewLearnHolder(val binding: LayoutQuestionReviewBinding) :
-        RecyclerView.ViewHolder(binding.root)
+        RecyclerView.ViewHolder(binding.root) {
+        var countDownTimer: CountDownTimer? = null
+        }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReviewLearnHolder {
         val view = LayoutQuestionReviewBinding.inflate(
@@ -45,6 +49,36 @@ class ReviewLearnAdapter(
     }
 
     override fun onBindViewHolder(holder: ReviewLearnHolder, position: Int) {
+
+
+        val progressBar: ProgressBar = holder.itemView.findViewById(R.id.questionProgressBar)
+        val tvTimer: TextView = holder.itemView.findViewById(R.id.tvTimer)
+
+        // Cancel any previous timer when a new item is bound
+        holder.countDownTimer?.cancel()
+
+        val totalTime = 10000L // 10 seconds
+        progressBar.max = (totalTime / 1000).toInt()
+        progressBar.progress = progressBar.max
+
+        holder.countDownTimer = object : CountDownTimer(totalTime, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsLeft = millisUntilFinished / 1000
+                tvTimer.text = "0:$secondsLeft"
+                progressBar.progress = secondsLeft.toInt()
+            }
+
+            override fun onFinish() {
+                // Handle when time runs out and no answer was provided
+                tvTimer.text = "0:00"
+                progressBar.progress = 0
+                handleTimeOut(holder)
+            }
+        }.start()
+
+
+
+
         val question: TextView = holder.binding.tvQuestion
         question.text = listFlashcards[position].term.toString()
         val options: List<FlashCardModel>
@@ -216,17 +250,21 @@ class ReviewLearnAdapter(
         countAnswer++
         val nextPosition = recyclerView.getChildAdapterPosition(recyclerView.getChildAt(0)) + 1
         if (countAnswer >= listFlashcards.size) {
-            val i = Intent(context, Excellent::class.java)
-            val bundle = Bundle()
-            countTrue?.let { bundle.putInt("countTrue", it) }
-            countFalse?.let { bundle.putInt("countFalse", it) }
-            bundle.putInt("listSize", listFlashcards.size)
-            i.putExtra("listCardTest", Gson().toJson(listFlashcards))
-            i.putExtras(bundle)
-            context.startActivity(i)
+            val activity = recyclerView.context as? FragmentActivity
+//            activity?.let {
+                val navController = activity?.findNavController(R.id.nav_host_fragment)
+                val action = ReviewLearnDirections.actionReviewLearnToExcellent2(
+                    Gson().toJson(listFlashcards),
+                    countTrue ?: 0,
+                    countFalse ?: 0,
+                    listFlashcards.size
+                )
+                navController?.navigate(action)
+//            }
         }
         if (nextPosition < listFlashcards.size) {
             recyclerView.smoothScrollToPosition(nextPosition)
+            notifyItemChanged(nextPosition)
         } else {
             if (countAnswer < listFlashcards.size) {
                 CustomToast(context).makeText(
@@ -242,6 +280,15 @@ class ReviewLearnAdapter(
     fun updateData(newData: List<FlashCardModel>) {
         this.listFlashcards = newData
         notifyDataSetChanged()
+    }
+
+    private fun handleTimeOut(holder: ReviewLearnHolder) {
+        if (listFlashcards[holder.bindingAdapterPosition].isAnswer == false) {
+            val correctAnswer = listFlashcards[holder.bindingAdapterPosition].definition.toString()
+            showIncorrectDialog(correctAnswer)
+            countFalse = (countFalse ?: 0) + 1
+            listFlashcards[holder.bindingAdapterPosition].isAnswer = true
+        }
     }
 
 

@@ -18,64 +18,33 @@ import javax.inject.Inject
 @HiltViewModel
 class QuoteViewModel @Inject constructor(private val quoteRepository: QuoteRepository) :
     ViewModel() {
-    //    val dataQuote: MutableLiveData<List<QuoteModel>> = MutableLiveData()
     val isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
-    private var currentPosition = 0
-    fun getCurrentPosition(): Int {
-        return currentPosition
-    }
-
-    fun setCurrentPosition(position: Int) {
-        currentPosition = position
-    }
-
-    fun getNextQuotePosition(): Int {
-        return if (currentPosition < quotes.value?.results?.size!!) {
-            currentPosition + 1
-        } else {
-            currentPosition
-        }
-    }
-
-    fun getPrevQuotePosition(): Int {
-        return if (currentPosition > 0) {
-            currentPosition - 1
-        } else {
-            currentPosition
-        }
-    }
-
     val quotes: LiveData<QuoteResponse>
         get() = quoteRepository.quotes
 
     val localQuote: LiveData<List<QuoteEntity>>
         get() = quoteRepository.localQuotes
 
-    //    init {
-    fun getRemoteQuote(context: Context) {
+    fun getRemoteQuote() {
         viewModelScope.launch(Dispatchers.IO) {
-            // Set isLoading to true before making the network call
             isLoading.postValue(true)
-
             try {
                 quoteRepository.getQuotes(1)
             } catch (e: Exception) {
-                CustomToast(context).makeText(
-                    context,
-                    e.message.toString(),
-                    CustomToast.LONG,
-                    CustomToast.ERROR
-                ).show()
+//                CustomToast(context).makeText(
+//                    context,
+//                    e.message.toString(),
+//                    CustomToast.LONG,
+//                    CustomToast.ERROR
+//                ).show()
+                Log.d("ToastQuote", "Error: ${e.message}")
             } finally {
-                // Set isLoading to false after the network call is complete
                 isLoading.postValue(false)
             }
         }
     }
-//    }
 
     fun getLocalQuotes(userId: String) {
-        Log.d("getLocalQuotes", userId.toString())
         viewModelScope.launch(Dispatchers.IO) {
             quoteRepository.getLocalQuotes(userId)
         }

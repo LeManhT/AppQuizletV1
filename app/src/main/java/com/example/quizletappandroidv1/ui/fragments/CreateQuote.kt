@@ -72,6 +72,7 @@ class CreateQuote : Fragment(), TextToSpeech.OnInitListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        textToSpeech = TextToSpeech(requireContext(), this)
         loadAvailableLanguage()
 
         binding.imgMic.setOnClickListener {

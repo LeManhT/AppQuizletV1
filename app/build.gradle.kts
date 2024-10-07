@@ -19,7 +19,6 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -97,6 +96,9 @@ dependencies {
     implementation("com.github.amsiq:swipereveallayout:1.4.1-x")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("de.hdodenhof:circleimageview:3.1.0")
+
+    val paging_version = "3.3.2"
+    implementation("androidx.paging:paging-runtime:$paging_version")
 
 
 //    implementation ("com.ismaeldivita.chipnavigation:chip-navigation-bar:1.3.4")

@@ -37,6 +37,26 @@
             android:textAllCaps="false" />
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnSuspend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/suspend"
+            android:layout_marginRight="@dimen/mar_10"
+            android:textColor="@color/white"
+            android:background="@color/btn_primary"
+            android:textAllCaps="false" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnDeSuspend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/de_suspend"
+            android:layout_marginRight="@dimen/mar_10"
+            android:textColor="@color/white"
+            android:background="@color/btn_primary"
+            android:textAllCaps="false" />
+
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnDelete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -44,6 +64,7 @@
             android:textColor="@color/white"
             android:background="@color/btn_primary"
             android:textAllCaps="false" />
+
     </LinearLayout>
 
 </LinearLayout>

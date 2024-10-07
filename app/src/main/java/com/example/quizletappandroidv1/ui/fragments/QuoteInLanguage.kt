@@ -27,6 +27,7 @@ class QuoteInLanguage : Fragment(), QuotifyAdapter.OnQuotifyListener {
     private lateinit var quoteAdapter: QuotifyAdapter
     private var progressDialog: ProgressDialog? = null
     private val myViewModel: QuoteViewModel by viewModels()
+    private var currentPosition = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,20 +40,20 @@ class QuoteInLanguage : Fragment(), QuotifyAdapter.OnQuotifyListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        myViewModel.getRemoteQuote(requireContext())
+        myViewModel.getRemoteQuote()
 
         binding.txtBack.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
-        quoteAdapter = QuotifyAdapter(myViewModel, binding.rvQuote)
+        quoteAdapter = QuotifyAdapter(binding.rvQuote)
         binding.rvQuote.adapter = quoteAdapter
         binding.rvQuote.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         val snapHelperQuotify = PagerSnapHelper()
         snapHelperQuotify.attachToRecyclerView(binding.rvQuote)
         myViewModel.quotes.observe(viewLifecycleOwner) {
-            quoteAdapter.notifyDataSetChanged()
+            quoteAdapter.updateQuotes(it.results)
         }
 
         myViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
@@ -65,11 +66,11 @@ class QuoteInLanguage : Fragment(), QuotifyAdapter.OnQuotifyListener {
         }
 
         binding.txtNextQuote.setOnClickListener {
-            quoteAdapter.handleNextQuote()
+            currentPosition = quoteAdapter.handleNextQuote(currentPosition)
         }
 
         binding.txtPrevQuote.setOnClickListener {
-            quoteAdapter.handlePrevQuote()
+            currentPosition = quoteAdapter.handlePrevQuote(currentPosition)
         }
 
         quoteAdapter.setOnQuoteShareListener(this)

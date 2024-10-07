@@ -4,22 +4,21 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quizletappandroidv1.databinding.QuoteItemWithDeleteBinding
-import com.example.quizletappandroidv1.viewmodel.quote.QuoteViewModel
-import dagger.hilt.android.AndroidEntryPoint
+import com.example.quizletappandroidv1.entity.QuoteEntity
 
-@AndroidEntryPoint
 class QuoteLocalAdapter(
-    private val viewModel: QuoteViewModel,
-    private val recyclerView: RecyclerView
-) :
-    RecyclerView.Adapter<QuoteLocalAdapter.QuotifyViewHolder>() {
+    private val recyclerView: RecyclerView,
+    private val onQuotifyListener: OnQuotifyLocalListener,
+) : RecyclerView.Adapter<QuoteLocalAdapter.QuotifyViewHolder>() {
+
+    private var quotes: List<QuoteEntity> = mutableListOf()
 
     interface OnQuotifyLocalListener {
         fun handleShareQuote(position: Int)
         fun handleDeleteQuote(quoteId: Long)
+        fun handleNextQuote(position: Int)
+        fun handlePrevQuote(position: Int)
     }
-
-    private var onQuotifyListener: OnQuotifyLocalListener? = null
 
     class QuotifyViewHolder(val binding: QuoteItemWithDeleteBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -31,47 +30,46 @@ class QuoteLocalAdapter(
     }
 
     override fun onBindViewHolder(holder: QuotifyViewHolder, position: Int) {
-        val item = viewModel.localQuote.value?.get(position)
-//        item?.let {
-//            holder.bind(it, onQuotifyListener)
-//        }
-        holder.binding.quoteText.text = item?.content
-        holder.binding.quoteAuthor.text = item?.author
+        val item = quotes[position]
+        holder.binding.quoteText.text = item.content
+        holder.binding.quoteAuthor.text = item.author
         holder.binding.btnShareQuote.setOnClickListener {
-            onQuotifyListener?.handleShareQuote(position)
+            onQuotifyListener.handleShareQuote(position)
         }
 
         holder.binding.btnDeleteQuote.setOnClickListener {
-            if (item != null) {
-                onQuotifyListener?.handleDeleteQuote(item.quoteId)
-            }
+            onQuotifyListener.handleDeleteQuote(item.quoteId)
         }
         holder.binding.executePendingBindings()
     }
 
     override fun getItemCount(): Int {
-        return viewModel.localQuote.value?.size ?: 0
+        return quotes.size
     }
 
-    fun handleNextQuote() {
-        val nextPosition = viewModel.getNextQuotePosition()
-        viewModel.setCurrentPosition(nextPosition)
+    fun updateQuotes(newQuotes: List<QuoteEntity>) {
+        quotes = newQuotes
+        notifyDataSetChanged()
+    }
+
+
+    fun handleNextQuote(currentPosition: Int): Int {
+        val nextPosition =
+            if (currentPosition < quotes.size - 1) currentPosition + 1 else currentPosition
         recyclerView.smoothScrollToPosition(nextPosition)
+        return nextPosition
     }
 
-    fun handlePrevQuote() {
-        val prevPosition = viewModel.getPrevQuotePosition()
-        viewModel.setCurrentPosition(prevPosition)
+    fun handlePrevQuote(currentPosition: Int): Int {
+        val prevPosition = if (currentPosition > 0) currentPosition - 1 else currentPosition
         recyclerView.smoothScrollToPosition(prevPosition)
+        return prevPosition
     }
 
     fun getQuoteText(position: Int): List<String?> {
-        val item = viewModel.quotes.value?.results?.get(position)
-        return listOf(item?.content, item?.author)
+        val item = quotes[position]
+        return listOf(item.content, item.author)
     }
 
-    fun setOnQuoteShareListener(listener: OnQuotifyLocalListener) {
-        onQuotifyListener = listener
-    }
 
 }

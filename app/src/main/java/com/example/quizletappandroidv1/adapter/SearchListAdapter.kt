@@ -12,7 +12,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.example.appquizlet.model.SearchSetModel
 import com.example.quizletappandroidv1.R
-import com.example.quizletappandroidv1.models.StudySetModel
 
 class SearchListAdapter(
     private var onSearchSetClick: ISearchSetClick? = null
@@ -28,6 +27,7 @@ class SearchListAdapter(
     inner class ItemSearchBookHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val txtStudySetSearch: TextView = itemView.findViewById(R.id.txtStudySetSearch)
         val imgStudySetAvatarSearch: ImageView = itemView.findViewById(R.id.imgStudySetAvatarSearch)
+        val txtStudySetUsername: TextView = itemView.findViewById(R.id.txtStudySetUsername)
     }
 
 
@@ -39,9 +39,8 @@ class SearchListAdapter(
 
     override fun onBindViewHolder(holder: ItemSearchBookHolder, position: Int) {
         val studyset = listStudysets[position]
-
         holder.txtStudySetSearch.text = studyset.name
-
+        holder.txtStudySetUsername.text = studyset.idOwner
 //        if (studyset.image?.isNotEmpty() == true) {
 //            Glide.with(holder.itemView.context)
 //                .load(studyset.image)

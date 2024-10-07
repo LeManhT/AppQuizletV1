@@ -1,10 +1,12 @@
 package com.example.quizletappandroidv1.ui.fragments
 
+import android.app.ProgressDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,14 +16,18 @@ import com.example.quizletappandroidv1.adapter.RVFolderItemAdapter
 import com.example.quizletappandroidv1.databinding.FragmentFolderBinding
 import com.example.quizletappandroidv1.listener.RVFolderItem
 import com.example.quizletappandroidv1.models.FolderModel
+import com.example.quizletappandroidv1.viewmodel.studyset.DocumentViewModel
 import com.example.quizletappandroidv1.viewmodel.user.UserViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class FolderFragment : Fragment() {
     private lateinit var binding: FragmentFolderBinding
     private val userViewModel: UserViewModel by viewModels()
+    private val documentViewModel: DocumentViewModel by activityViewModels()
+    private lateinit var progressDialog: ProgressDialog
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,9 +45,9 @@ class FolderFragment : Fragment() {
         val adapterFolder =
             RVFolderItemAdapter(requireContext(), object : RVFolderItem {
                 override fun handleClickFolderItem(folderItem: FolderModel, position: Int) {
-//                    val action =
-//                        FragmentFolderDirections.actionFragmentFolderToFolderDetail(folderItem.id)
-//                    findNavController().navigate(action)
+                    val action =
+                        FolderFragmentDirections.actionFragmentFoldersToFolderDetail(folderItem.id)
+                    findNavController().navigate(action)
                 }
             })
         userViewModel.userData.observe(viewLifecycleOwner) { result ->
@@ -55,6 +61,17 @@ class FolderFragment : Fragment() {
                 }
                 adapterFolder.updateData(it.documents.folders)
             }.onFailure { }
+        }
+
+        documentViewModel.folderResponse.observe(viewLifecycleOwner) { result ->
+            try {
+                showLoading(resources.getString(R.string.delete_folder_loading))
+                adapterFolder.updateData(result.documents.folders)
+            } catch (e: Exception) {
+                Timber.e(e)
+            } finally {
+                progressDialog.dismiss()
+            }
         }
         // Access the RecyclerView through the binding
         val rvFolder = binding.rvFolderFragment
@@ -70,11 +87,15 @@ class FolderFragment : Fragment() {
                         dialog.dismiss()
                     }
                     .setPositiveButton(resources.getString(R.string.accept)) { dialog, which ->
+                        MyApplication.userId?.let { documentViewModel.deleteFolder(it, folderId) }
                     }
                     .show()
-
             }
         })
+    }
+
+    private fun showLoading(msg: String) {
+        progressDialog = ProgressDialog.show(requireContext(), null, msg)
     }
 
 }

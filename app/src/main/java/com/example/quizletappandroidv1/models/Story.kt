@@ -8,12 +8,14 @@ import androidx.room.PrimaryKey
 class Story(
     val title: String,
     val content: String,
-    val newWords: List<NewWord>
+    val newWords: List<NewWord>,
+    val imagePath: String
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         title = parcel.readString() ?: "",
         content = parcel.readString() ?: "",
-        newWords = parcel.createTypedArrayList(NewWord.CREATOR) ?: emptyList()
+        newWords = parcel.createTypedArrayList(NewWord.CREATOR) ?: emptyList(),
+        imagePath = parcel.readString() ?: ""
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -42,7 +44,7 @@ data class NewWord(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val word: String,
     var meaning: String,
-    val isFavourite: Boolean = false
+    var isFavourite: Boolean = false
 ) : Parcelable {
 
     constructor(parcel: Parcel) : this(

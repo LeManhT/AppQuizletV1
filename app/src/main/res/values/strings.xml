@@ -463,4 +463,13 @@
     <string name="you_must_field_all">You must fill in all fields</string>
     <string name="email_not_valid">Email is not valid</string>
     <string name="choose_image">Choose image</string>
+    <string name="confirm_delete_user">Are you sure to delete this user permanently ?</string>
+    <string name="confirm_suspend_user">Are you sure to suspend this user ? If you suspend this user,they won\'t access to the app</string>
+    <string name="suspend">Suspend</string>
+    <string name="de_suspend">Unsuspend</string>
+    <string name="confirm_unsuspend_user">Do you want to unsuspend this user ?</string>
+    <string name="added_to_favorites">Add new word to favourite successfully</string>
+    <string name="removed_from_favorites">Remove new word from favourite</string>
+    <string name="are_you_sure_to_delete_word_from_favourite">Are you sure to delete this word from favourite ?</string>
+    <string name="manage_story">Manage Story</string>
 </resources>

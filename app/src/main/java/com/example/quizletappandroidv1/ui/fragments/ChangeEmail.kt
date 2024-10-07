@@ -15,8 +15,10 @@ import com.example.quizletappandroidv1.R
 import com.example.quizletappandroidv1.custom.CustomToast
 import com.example.quizletappandroidv1.databinding.FragmentChangeEmailBinding
 import com.example.quizletappandroidv1.viewmodel.user.UserViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
+@AndroidEntryPoint
 class ChangeEmail : Fragment() {
     private lateinit var binding: FragmentChangeEmailBinding
     private val userViewModel: UserViewModel by viewModels()

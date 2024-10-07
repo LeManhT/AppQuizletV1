@@ -39,6 +39,9 @@
         <action
             android:id="@+id/action_startAppFragment_to_fragmentLoginAdmin"
             app:destination="@id/fragmentLoginAdmin" />
+        <action
+            android:id="@+id/action_startAppFragment_to_fragmentSearch2"
+            app:destination="@id/fragmentSearch2" />
     </fragment>
     <fragment
         android:id="@+id/fragmentLoginAdmin"
@@ -47,5 +50,24 @@
         <action
             android:id="@+id/action_fragmentLoginAdmin_to_startAppFragment"
             app:destination="@id/startAppFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentSearch2"
+        android:name="com.example.quizletappandroidv1.ui.fragments.FragmentSearch"
+        android:label="FragmentSearch" >
+        <action
+            android:id="@+id/action_fragmentSearch2_to_startAppFragment"
+            app:destination="@id/startAppFragment" />
+        <action
+            android:id="@+id/action_fragmentSearch2_to_fragmentAllResult"
+            app:destination="@id/fragmentAllResult" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentAllResult"
+        android:name="com.example.quizletappandroidv1.ui.fragments.FragmentAllResult"
+        android:label="FragmentAllResult" >
+        <action
+            android:id="@+id/action_fragmentAllResult_to_fragmentSearch2"
+            app:destination="@id/fragmentSearch2" />
     </fragment>
 </navigation>

@@ -25,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -74,7 +75,7 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
     private lateinit var binding: FragmentCreateSetBinding
     private lateinit var progressDialog: ProgressDialog
     private val homeViewModel by viewModels<HomeViewModel>()
-    private val documentViewModel by viewModels<DocumentViewModel>()
+    private val documentViewModel by activityViewModels<DocumentViewModel>()
 
     //    private lateinit var apiService: ApiService
     private var listSet = mutableListOf<FlashCardModel>()
@@ -266,7 +267,7 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
             if (currentPoint > 30) {
                 showImportAlertDialog(requireContext())
             } else {
-                findNavController().navigate(R.id.action_createSet_to_add3)
+                findNavController().navigate(R.id.action_createSet_to_quizletPlus)
             }
         }
 
@@ -306,15 +307,16 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
             }
         excelPickerLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-
                 Log.d("ImportExcel12222", "registerForActivityResult Import Excel Request Code")
 
                 if (result.resultCode == Activity.RESULT_OK) {
                     val selectedFileUri = result.data?.data
+                    Log.d("ImportExcel12222", "Vào resultCode ${selectedFileUri}")
                     if (selectedFileUri != null) {
                         val filePath = FileHelperUtils.getPath(
                             requireContext(), selectedFileUri
                         )
+                        Log.d("ImportExcel12222", "Vào resultCode  filePath ${filePath}")
                         if (filePath != null && filePath.endsWith(".xlsx")) {
                             importExcelFile(filePath)
                         } else {
@@ -403,11 +405,13 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
         )
     }
 
+    // Launch the file picker
     private fun launchFilePicker() {
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.type =
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" // MIME type for Excel files
-        startActivityForResult(intent, IMPORT_EXCEL_REQUEST_CODE)
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+            type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            addCategory(Intent.CATEGORY_OPENABLE)
+        }
+        excelPickerLauncher.launch(intent)
     }
 
     @Deprecated("Deprecated in Java")
@@ -453,15 +457,12 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
             if (filePath.endsWith(".xlsx")) {
                 HSSFWorkbook(inputStream)
             }  // For XSSF (Excel 2007+ XML) format //
-//        }
-//        else if (filePath.endsWith(".xls")) {
-//            HSSFWorkbook(inputStream)
-//            // For HSSF (Excel 97-2003) format //
-//        } else {
-//            Log.e("ImportExcel", "Unsupported file type")
-//        }
-//        return
-//    }
+            else if (filePath.endsWith(".xls")) {
+                HSSFWorkbook(inputStream)
+                // For HSSF (Excel 97-2003) format //
+            } else {
+                Log.e("ImportExcel", "Unsupported file type")
+            }
             val sheet = workbook.getSheetAt(0)
             listSet.clear()
             for (rowIndex in 0 until sheet.physicalNumberOfRows) {
@@ -477,7 +478,7 @@ class CreateSet : Fragment(), CreateSetItemAdapter.OnIconClickListener {
                             term = term, definition = definition
                         )
                         listSet.add(flashCard)
-                        adapterCreateSet.notifyDataSetChanged()
+                        adapterCreateSet.updateListSet(listSet)
                     }
                 }
             }
